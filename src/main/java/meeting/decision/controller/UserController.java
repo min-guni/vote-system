@@ -1,28 +1,17 @@
 package meeting.decision.controller;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import meeting.decision.argumentresolver.Login;
-import meeting.decision.argumentresolver.SessionConst;
-import meeting.decision.domain.User;
-import meeting.decision.dto.UserUpdateDTO;
-import meeting.decision.exception.LoginFailedException;
-import meeting.decision.exception.UsernameAlreadyExistsException;
+import meeting.decision.dto.user.UserUpdateDTO;
 import meeting.decision.jwt.JwtTokenProvider;
-import meeting.decision.service.RoomService;
 import meeting.decision.service.UserService;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-import javax.security.auth.login.LoginException;
-import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/user")
@@ -61,11 +50,16 @@ public class UserController {
     }
 
     @PostMapping("/")
-    public UserUpdateDTO updateUser(@Login Long userId, @ModelAttribute UserUpdateDTO updateParam){
+    public String updateUser(@Login Long userId, UserUpdateDTO updateParam){
+        log.info(updateParam.getUsername());
+        log.info(updateParam.getHashedPassword());
         //update
+        updateParam.setHashedPassword(passwordEncoder.encode(updateParam.getHashedPassword()));
+        log.info(updateParam.getHashedPassword());
         userService.update(userId, updateParam);
-        return updateParam;
+        return "success";
     }
+
 
 
 }

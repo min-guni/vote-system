@@ -2,17 +2,22 @@ package meeting.decision.domain;
 
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
+import org.springframework.cglib.core.Local;
+import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
-@Data
+@Getter @Setter
+@ToString(exclude = "roomList")
 @Entity
 @Table(name = "users")
+@NoArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,13 +26,20 @@ public class User {
     private String username;
     private String hashedPassword;
 
-    @ManyToMany(mappedBy = "userList")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Set<Room> roomSet = new HashSet<>();
+    private LocalDateTime createDate;
+    private LocalDateTime lastUpdateDate;
 
+    @OneToMany(mappedBy = "user")
+    private List<RoomParticipant> roomList = new ArrayList<>();
 
-    public User() {
+    @PrePersist
+    private void setCreateDate(){
+        this.createDate = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    private void setLastUpdateDate(){
+        this.lastUpdateDate = LocalDateTime.now();
     }
 
     public User(String username, String hashedPassword) {

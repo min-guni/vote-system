@@ -1,17 +1,25 @@
 package meeting.decision.exception;
 
 
+import com.sun.jdi.request.DuplicateRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.NoSuchElementException;
+
 @RestControllerAdvice
 public class ExceptionControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(UsernameAlreadyExistsException.class)
-    public String userNameAlreadyExHandle(UsernameAlreadyExistsException e) {
+    @ExceptionHandler({UsernameAlreadyExistsException.class,
+            NoSuchElementException.class,
+            DuplicateRequestException.class,
+            VoteIsNotActivatedException.class,
+            VoteResultTypeEnumParseException.class,
+            DuplicateUserExeption.class})
+    public String BadRequestExHandle(Exception e) {
         return e.getMessage();
     }
 
@@ -27,10 +35,6 @@ public class ExceptionControllerAdvice {
         return e.getMessage();
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(VoteResultTypeEnumParseException.class)
-    public String voteResultTypeEnumParseExHandle(VoteResultTypeEnumParseException e){
-        return e.getMessage();
-    }
+
 
 }

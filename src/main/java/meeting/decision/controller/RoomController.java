@@ -2,15 +2,15 @@ package meeting.decision.controller;
 
 import lombok.RequiredArgsConstructor;
 import meeting.decision.argumentresolver.Login;
-import meeting.decision.domain.Room;
 import meeting.decision.domain.User;
-import meeting.decision.dto.RoomUpdateDTO;
+import meeting.decision.dto.room.RoomOutDTO;
+import meeting.decision.dto.room.RoomUpdateDTO;
+import meeting.decision.dto.user.UserOutDTO;
 import meeting.decision.service.RoomService;
 import meeting.decision.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @RestController
 @RequestMapping("/room")
@@ -27,25 +27,35 @@ public class RoomController {
 
     //모든 방 찾기
     @GetMapping("/")
-    public Set<Long> findRoom(@Login Long userId){
-        User user = userService.findById(userId);
-        return user.getRoomSet().stream()
-                .map(Room::getId)
-                .collect(Collectors.toSet());
+    public List<RoomOutDTO> findRoom(@Login Long userId){
+        return roomService.findAllRoomByUserId(userId);
+//
+//        User user = userService.findById(userId);
+//        return user.getRoomList().stream()
+//                .map((participant)-> new RoomOutDTO(participant.getRoom().getId(),
+//                        participant.getRoom().getRoomName(),
+//                        participant.getRoom().getOwner().getId(),
+//                        participant.getRoom().getUserList().size()))
+//                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/{roomId}")
+    public List<UserOutDTO> findUser(@Login Long userId, @PathVariable Long roomId){
+        return roomService.findAllUserByRoomId(userId, roomId);
     }
 
 
     //인원추가(방장권한)없으면 403
-    @PutMapping("/{roomId}/{username}")
-    public String addUser(@Login Long userId, @PathVariable String username, @PathVariable Long roomId ){
-        roomService.addUserToRoom(roomId, userId, username);
+    @PutMapping("/{roomId}/{invitedId}")
+    public String addUser(@Login Long userId, @PathVariable Long invitedId, @PathVariable Long roomId ){
+        roomService.addUserToRoom(userId, roomId, invitedId);
         return "success";
     }
 
     //인원 삭제(방장권한)없으면 403
-    @DeleteMapping("/{roomId}/{username}")
-    public String deleteUser(@Login Long userId,@PathVariable Long roomId, @PathVariable String username){
-        roomService.deleteUserFromRoom(roomId, userId, username);
+    @DeleteMapping("/{roomId}/{deleteId}")
+    public String deleteUser(@Login Long userId,@PathVariable Long roomId, @PathVariable Long deleteId){
+        roomService.deleteUserFromRoom(userId, roomId, deleteId);
         return "success";
     }
 

@@ -3,13 +3,19 @@ package meeting.decision.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter @Setter
+@NoArgsConstructor
 @Table(name = "votes")
 public class Vote {
     @Id
@@ -23,19 +29,20 @@ public class Vote {
     private Room room;
 
 
-    @OneToMany(cascade = CascadeType.ALL ,orphanRemoval = true)
-    private Set<VotePaper> papers = new HashSet<>();
+    @OneToMany(mappedBy = "vote", cascade = CascadeType.ALL ,orphanRemoval = true)
+    private List<VotePaper> papers = new ArrayList<>();
 
 
     private LocalDateTime timeStamp;
+
+    private boolean isAnonymous;
     private boolean isActivated;
 
-    public Vote() {
-    }
-
-    public Vote(String voteName,  Room room) {
+    //pre 뭐시기도 사용해보기
+    public Vote(String voteName, boolean isAnonymous , Room room) {
         this.voteName = voteName;
         this.room = room;
+        this.isAnonymous = isAnonymous;
         this.isActivated = true;
         this.timeStamp = LocalDateTime.now();
     }

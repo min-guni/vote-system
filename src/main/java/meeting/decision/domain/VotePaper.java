@@ -1,13 +1,16 @@
 package meeting.decision.domain;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter @Setter
 @Table(name = "vote_papers")
+@NoArgsConstructor
 public class VotePaper {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,14 +22,23 @@ public class VotePaper {
 
     private LocalDateTime timeStamp;
 
+    @Enumerated
     private VoteResultType voteResultType;
 
-    public VotePaper() {
+    @ManyToOne
+    @JoinColumn(name = "vote_id")
+    private Vote vote;
+
+    public VotePaper(User user, Vote vote, VoteResultType voteResultType) {
+        this.user = user;
+        this.vote = vote;
+        vote.getPapers().add(this);
+
+        this.voteResultType = voteResultType;
     }
 
-    public VotePaper(User user, VoteResultType voteResultType) {
-        this.user = user;
-        this.timeStamp = LocalDateTime.now();
-        this.voteResultType = voteResultType;
+    @PrePersist
+    public void setTimeStamp(){
+        timeStamp = LocalDateTime.now();
     }
 }

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - DecisionApplicationTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>DecisionApplicationTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/meeting.decision.html">meeting.decision</a> &gt; DecisionApplicationTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">1</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.801s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">contextLoads()</td>
+<td class="success">0.801s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>10:43:08.300 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [meeting.decision.DecisionApplicationTests]: DecisionApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+10:43:08.468 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration meeting.decision.DecisionApplication for test class meeting.decision.DecisionApplicationTests
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.3)
+
+2024-04-25T10:43:09.341+09:00  INFO 43696 --- [decision] [    Test worker] m.decision.DecisionApplicationTests      : Starting DecisionApplicationTests using Java 17.0.9 with PID 43696 (started by mingg in C:\Users\mingg\OneDrive\바탕 화면\스프링 독학\decision\decision)
+2024-04-25T10:43:09.343+09:00  INFO 43696 --- [decision] [    Test worker] m.decision.DecisionApplicationTests      : No active profile set, falling back to 1 default profile: &quot;default&quot;
+2024-04-25T10:43:10.919+09:00  INFO 43696 --- [decision] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-04-25T10:43:11.094+09:00  INFO 43696 --- [decision] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 155 ms. Found 5 JPA repository interfaces.
+2024-04-25T10:43:12.370+09:00  INFO 43696 --- [decision] [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2024-04-25T10:43:12.595+09:00  INFO 43696 --- [decision] [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.mariadb.jdbc.Connection@54ccb3
+2024-04-25T10:43:12.599+09:00  INFO 43696 --- [decision] [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2024-04-25T10:43:12.696+09:00  INFO 43696 --- [decision] [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-04-25T10:43:12.884+09:00  INFO 43696 --- [decision] [    Test worker] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
+2024-04-25T10:43:13.003+09:00  INFO 43696 --- [decision] [    Test worker] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2024-04-25T10:43:13.616+09:00  INFO 43696 --- [decision] [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-04-25T10:43:13.714+09:00  WARN 43696 --- [decision] [    Test worker] org.hibernate.orm.deprecation            : HHH90000025: MariaDBDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2024-04-25T10:43:13.758+09:00 DEBUG 43696 --- [decision] [    Test worker] o.h.t.d.sql.spi.DdlTypeRegistry          : addDescriptor(12, org.hibernate.type.descriptor.sql.internal.CapacityDependentDdlType@2bb3f39e) replaced previous registration(org.hibernate.type.descriptor.sql.internal.CapacityDependentDdlType@11f3400c)
+2024-04-25T10:43:13.759+09:00 DEBUG 43696 --- [decision] [    Test worker] o.h.t.d.sql.spi.DdlTypeRegistry          : addDescriptor(-9, org.hibernate.type.descriptor.sql.internal.CapacityDependentDdlType@628b503a) replaced previous registration(org.hibernate.type.descriptor.sql.internal.CapacityDependentDdlType@2558f65c)
+2024-04-25T10:43:13.759+09:00 DEBUG 43696 --- [decision] [    Test worker] o.h.t.d.sql.spi.DdlTypeRegistry          : addDescriptor(-3, org.hibernate.type.descriptor.sql.internal.CapacityDependentDdlType@11c3ce6a) replaced previous registration(org.hibernate.type.descriptor.sql.internal.CapacityDependentDdlType@1a3b1f7e)
+2024-04-25T10:43:13.759+09:00 DEBUG 43696 --- [decision] [    Test worker] o.h.t.d.sql.spi.DdlTypeRegistry          : addDescriptor(4003, org.hibernate.type.descriptor.sql.internal.DdlTypeImpl@22899683) replaced previous registration(org.hibernate.type.descriptor.sql.internal.DdlTypeImpl@40017e98)
+2024-04-25T10:43:13.760+09:00 DEBUG 43696 --- [decision] [    Test worker] o.h.t.d.sql.spi.DdlTypeRegistry          : addDescriptor(4001, org.hibernate.type.descriptor.sql.internal.DdlTypeImpl@4fbe486c) replaced previous registration(org.hibernate.type.descriptor.sql.internal.DdlTypeImpl@dbc7e0a)
+2024-04-25T10:43:13.760+09:00 DEBUG 43696 --- [decision] [    Test worker] o.h.t.d.sql.spi.DdlTypeRegistry          : addDescriptor(4002, org.hibernate.type.descriptor.sql.internal.DdlTypeImpl@636fccb0) replaced previous registration(org.hibernate.type.descriptor.sql.internal.DdlTypeImpl@28519bfb)
+2024-04-25T10:43:13.761+09:00 DEBUG 43696 --- [decision] [    Test worker] o.h.t.d.sql.spi.DdlTypeRegistry          : addDescriptor(2004, org.hibernate.type.descriptor.sql.internal.CapacityDependentDdlType@15914bb5) replaced previous registration(org.hibernate.type.descriptor.sql.internal.DdlTypeImpl@7b332b23)
+2024-04-25T10:43:13.761+09:00 DEBUG 43696 --- [decision] [    Test worker] o.h.t.d.sql.spi.DdlTypeRegistry          : addDescriptor(2005, org.hibernate.type.descriptor.sql.internal.CapacityDependentDdlType@66a472b9) replaced previous registration(org.hibernate.type.descriptor.sql.internal.DdlTypeImpl@428eb3d5)
+2024-04-25T10:43:13.761+09:00 DEBUG 43696 --- [decision] [    Test worker] o.h.t.d.sql.spi.DdlTypeRegistry          : addDescriptor(2011, org.hibernate.type.descriptor.sql.internal.CapacityDependentDdlType@5ddd84d2) replaced previous registration(org.hibernate.type.descriptor.sql.internal.DdlTypeImpl@3fd5d679)
+2024-04-25T10:43:15.303+09:00  INFO 43696 --- [decision] [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2024-04-25T10:43:15.307+09:00  INFO 43696 --- [decision] [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-04-25T10:43:15.864+09:00  INFO 43696 --- [decision] [    Test worker] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2024-04-25T10:43:17.556+09:00  WARN 43696 --- [decision] [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-04-25T10:43:18.694+09:00  INFO 43696 --- [decision] [    Test worker] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2024-04-25T10:43:18.699+09:00  INFO 43696 --- [decision] [    Test worker] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@a9e31e8]]
+2024-04-25T10:43:18.700+09:00  INFO 43696 --- [decision] [    Test worker] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2024-04-25T10:43:18.732+09:00  INFO 43696 --- [decision] [    Test worker] m.decision.DecisionApplicationTests      : Started DecisionApplicationTests in 9.881 seconds (process running for 12.527)
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 8.6</a> at 2024. 4. 25. 오전 10:43:19</p>
+</div>
+</div>
+</body>
+</html>

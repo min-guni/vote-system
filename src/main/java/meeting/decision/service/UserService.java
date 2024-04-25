@@ -1,9 +1,9 @@
 package meeting.decision.service;
 
 import lombok.RequiredArgsConstructor;
-import meeting.decision.domain.Room;
+import meeting.decision.domain.RoomParticipant;
 import meeting.decision.domain.User;
-import meeting.decision.dto.UserUpdateDTO;
+import meeting.decision.dto.user.UserUpdateDTO;
 import meeting.decision.exception.LoginFailedException;
 import meeting.decision.exception.UsernameAlreadyExistsException;
 import meeting.decision.repository.JpaUserRepository;
@@ -11,8 +11,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +51,9 @@ public class UserService {
         }
     }
 
-    public Set<Room> findAllRoomsById(Long userId){
-        return repository.findById(userId).orElseThrow().getRoomSet();
+    public List<RoomParticipant> findAllRoomsById(Long userId){
+        return repository.findById(userId).orElseThrow().getRoomList(); // N + 1 문제 나올 가능성 100퍼 ㅋㅋ
     }
+
+
 }

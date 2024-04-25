@@ -1,17 +1,20 @@
 package meeting.decision.service;
 
+import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
+import meeting.decision.annotation.CheckUser;
 import meeting.decision.domain.*;
-import meeting.decision.dto.VoteUpdateDTO;
+import meeting.decision.dto.vote.VoteInDTO;
+import meeting.decision.dto.vote.VoteOutDTO;
+import meeting.decision.dto.vote.VoteResultDTO;
+import meeting.decision.dto.vote.VoteUpdateDTO;
 import meeting.decision.exception.UserNotInVoteRoomException;
-import meeting.decision.repository.JpaRoomRepository;
-import meeting.decision.repository.JpaUserRepository;
-import meeting.decision.repository.JpaVoteRepository;
-import org.springframework.security.access.AuthorizationServiceException;
+import meeting.decision.exception.VoteIsNotActivatedException;
+import meeting.decision.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Set;
+import java.util.List;
 
 
 @Transactional
@@ -22,76 +25,72 @@ public class VoteService {
     private final JpaVoteRepository voteRepository;
     private final JpaUserRepository userRepository;
     private final JpaRoomRepository roomRepository;
-    public Vote create(Long ownerId, String voteName, Long roomId){
-        User owner = userRepository.findById(ownerId).orElseThrow();
+    private final JpaRoomParticipantRepository roomParticipantRepository;
+    private final JpaVotePaperRepository votePaperRepository;
+
+    @CheckUser(isOwner = true)
+    public VoteOutDTO create(Long ownerId, Long roomId, VoteInDTO voteInDTO){  // vote dto로 변경하기
         Room room = roomRepository.findById(roomId).orElseThrow();
-        //주인이 아니면
-        if(!room.getOwner().getId().equals(owner.getId())){
-            throw new AuthorizationServiceException("Only Owner Can Create Vote");
-        }
-        return voteRepository.save(new Vote(voteName, room));
+        Vote savedVote = voteRepository.save(new Vote(voteInDTO.getVoteName(), voteInDTO.isAnonymous(), room));
+
+        return new VoteOutDTO(savedVote.getId(),
+                roomId, savedVote.getVoteName(),
+                savedVote.isActivated(), savedVote.isAnonymous(),
+                new VoteResultDTO(0L,0L));
+
     }
+
+    @CheckUser(isOwner = true, isVote = true)
     public void update(Long ownerId, Long voteId, VoteUpdateDTO updateParam){
         Vote vote = voteRepository.findById(voteId).orElseThrow();
-        if(!vote.getRoom().getOwner().getId().equals(ownerId)){
-            throw new AuthorizationServiceException("Only Owner Can Update Vote");
-        }
         vote.setVoteName(updateParam.getVoteName());
         vote.setActivated(updateParam.isActivated());
     }
     //delete
+
+    @CheckUser(isOwner = true, isVote = true)
     public void delete(Long ownerId, Long voteId){
-        Vote vote = voteRepository.findById(voteId).orElseThrow();
-        if(!vote.getRoom().getOwner().getId().equals(ownerId)){
-            throw new AuthorizationServiceException("Only Owner Can Delete Vote");
-        }
         voteRepository.deleteById(voteId);
     }
 
-    public Vote findById(Long voteId){
-        return voteRepository.findById(voteId).orElseThrow();
-    }
-
-
     //reset VotePaper
+    @CheckUser(isOwner = true, isVote = true)
     public void resetVote(Long ownerId, Long voteId){
         Vote vote = voteRepository.findById(voteId).orElseThrow();
-        if(!vote.getRoom().getOwner().getId().equals(ownerId)){
-            throw new AuthorizationServiceException("Only Owner Can Reset Vote");
-        }
-        Set<VotePaper> papers = vote.getPapers();
-        papers.clear();
+        vote.getPapers().clear();
     }
 
-    //투표 결과 보여주기
-    public Set<VotePaper> getResult(Long ownerId, Long voteId){
-        Vote vote = voteRepository.findById(voteId).orElseThrow();
-        if(!vote.getRoom().getOwner().getId().equals(ownerId)){
-            throw new AuthorizationServiceException("Only Owner Can Request VoteResult");
-        }
+    //투표 결과 보여주기 inactivate일때만 보여주기 vote타입에 따라 다름
+    @CheckUser(isOwner = true, isVote = true)
+    public List<VotePaper> getResult(Long ownerId, Long voteId){   //dto로 변경해서 내보내기
+
         return voteRepository.findById(voteId).orElseThrow().getPapers();
     }
 
-    public boolean addVotePaper(Long voteId, Long userId, VoteResultType voteResultType){
+
+    //void 로 바꾸고 Exception 발생
+    @CheckUser(isVote = true)
+    public void addVotePaper(Long userId, Long voteId, VoteResultType voteResultType){
         //이미 투표에 투표있는지 확인 있는지 확인 있으면 false 반환
         User user = userRepository.findById(userId).orElseThrow();
         Vote vote = voteRepository.findById(voteId).orElseThrow();
-        if(vote.getPapers().stream().anyMatch(paper->paper.getUser().getId().equals(user.getId()))){
-            return false;
+
+        if(!vote.isActivated()){
+            throw new VoteIsNotActivatedException(voteId + "vote is not activated");
         }
 
-        //해당 룸 안에 사용자가 있어야 투표를 할 수 있음.
-        if(roomRepository.existsUserInRoom(vote.getRoom().getId(), user.getId()) == 0){
-            throw new UserNotInVoteRoomException(user.getUsername());
+        if(votePaperRepository.existsByVoteIdAndUserId(voteId, userId)){
+            throw new DuplicateRequestException();
         }
 
-        VotePaper votePaper = new VotePaper(user, voteResultType);
-        return vote.getPapers().add(votePaper);
+        VotePaper votePaper = new VotePaper(user ,vote, voteResultType);
+        votePaperRepository.save(votePaper);
     }
 
-    //투표들 다 보여주기
-    public Set<Vote> getVotes(Long userId, Long roomId){
-        if(roomRepository.existsUserInRoom(roomId, userId) == 0){
+    //투표들 다 보여주기 vote dto를 내보내는데 찬성수 반대수만
+    @CheckUser
+    public List<Vote> getVotes(Long userId, Long roomId){
+        if(roomParticipantRepository.existsByRoomIdAndUserId(roomId, userId)){
             throw new UserNotInVoteRoomException(String.valueOf(userId));
         }
         return voteRepository.findByRoomId(roomId);
