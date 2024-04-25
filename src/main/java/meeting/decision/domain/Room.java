@@ -28,7 +28,7 @@ public class Room {
     private User owner;
 
 
-    @OneToMany(mappedBy = "room")
+    @OneToMany(mappedBy = "room", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<RoomParticipant> userList = new ArrayList<>();
 
 

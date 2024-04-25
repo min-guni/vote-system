@@ -16,7 +16,7 @@ public class VotePaper {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne//유저
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -32,6 +32,7 @@ public class VotePaper {
     public VotePaper(User user, Vote vote, VoteResultType voteResultType) {
         this.user = user;
         this.vote = vote;
+
         vote.getPapers().add(this);
 
         this.voteResultType = voteResultType;

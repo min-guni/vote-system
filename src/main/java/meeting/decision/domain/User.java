@@ -29,12 +29,13 @@ public class User {
     private LocalDateTime createDate;
     private LocalDateTime lastUpdateDate;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<RoomParticipant> roomList = new ArrayList<>();
 
     @PrePersist
     private void setCreateDate(){
         this.createDate = LocalDateTime.now();
+        this.lastUpdateDate = LocalDateTime.now();
     }
 
     @PreUpdate

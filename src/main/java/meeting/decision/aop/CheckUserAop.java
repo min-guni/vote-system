@@ -1,6 +1,7 @@
 package meeting.decision.aop;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import meeting.decision.annotation.CheckUser;
 import meeting.decision.repository.JpaRoomParticipantRepository;
 import meeting.decision.repository.JpaRoomRepository;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Aspect
+@Slf4j
 @RequiredArgsConstructor
 public class CheckUserAop {
 
@@ -32,6 +34,8 @@ public class CheckUserAop {
 
     @Before("checkUserAnnotation() && isService() && @annotation(annotation) && args(userId,roomIdOrVoteId,..)")
     public void CheckUser(CheckUser annotation, Long userId, Long roomIdOrVoteId){
+        log.info("[CheckUserAOP] userId : {} , roomIdOrVoteId {}", userId, roomIdOrVoteId);
+
         if(annotation.isVote()){
             roomIdOrVoteId = voteRepository.findById(roomIdOrVoteId).orElseThrow().getRoom().getId();
         }
@@ -40,12 +44,12 @@ public class CheckUserAop {
         if(annotation.isOwner()){
             //checkOwner
             if(!roomRepository.findById(roomIdOrVoteId).orElseThrow().getOwner().getId().equals(userId)){
-                throw new AuthorizationServiceException("");
+                throw new AuthorizationServiceException("YOU ARE NOT "+roomIdOrVoteId + " OWNER");
             }
         }
         else{
-            if(participantRepository.existsByRoomIdAndUserId(roomIdOrVoteId,userId)){
-                throw new AuthorizationServiceException("");
+            if(!participantRepository.existsByRoomIdAndUserId(roomIdOrVoteId,userId)){
+                throw new AuthorizationServiceException("YOU ARE NOT IN " +roomIdOrVoteId + " ROOM");
             }
         }
     }

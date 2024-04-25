@@ -52,10 +52,8 @@ public class UserController {
     @PostMapping("/")
     public String updateUser(@Login Long userId, UserUpdateDTO updateParam){
         log.info(updateParam.getUsername());
-        log.info(updateParam.getHashedPassword());
-        //update
-        updateParam.setHashedPassword(passwordEncoder.encode(updateParam.getHashedPassword()));
-        log.info(updateParam.getHashedPassword());
+        log.info(updateParam.getPassword());
+        updateParam.setPassword(passwordEncoder.encode(updateParam.getPassword()));
         userService.update(userId, updateParam);
         return "success";
     }

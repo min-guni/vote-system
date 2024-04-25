@@ -34,7 +34,7 @@ public class UserService {
     public void update(Long userId, UserUpdateDTO updateParam){
         User updateUser = repository.findById(userId).orElseThrow();
         updateUser.setUsername(updateParam.getUsername());
-        updateUser.setHashedPassword(updateParam.getHashedPassword());
+        updateUser.setHashedPassword(updateParam.getPassword());
     }
 
     public User findById(Long userId){
@@ -42,7 +42,7 @@ public class UserService {
     }
 
     public Long checkUser(String username, String plainPassword){
-        User user = repository.findByUsername(username).orElseThrow();
+        User user = repository.findByUsername(username).orElseThrow(LoginFailedException::new);
         if(passwordEncoder.matches(plainPassword, user.getHashedPassword())){
             return user.getId();
         }

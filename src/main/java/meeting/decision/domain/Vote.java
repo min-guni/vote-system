@@ -24,7 +24,7 @@ public class Vote {
 
     private String voteName;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
     private Room room;
 

@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter @Getter @AllArgsConstructor
+@Getter @AllArgsConstructor
 public class VoteInDTO {
     private String voteName;
     private boolean isAnonymous;

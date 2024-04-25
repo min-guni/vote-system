@@ -14,7 +14,7 @@ import meeting.decision.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
 
 
 @Transactional
@@ -36,7 +36,7 @@ public class VoteService {
         return new VoteOutDTO(savedVote.getId(),
                 roomId, savedVote.getVoteName(),
                 savedVote.isActivated(), savedVote.isAnonymous(),
-                new VoteResultDTO(0L,0L));
+                0L,0L, 0L);
 
     }
 
@@ -61,12 +61,39 @@ public class VoteService {
     }
 
     //투표 결과 보여주기 inactivate일때만 보여주기 vote타입에 따라 다름
-    @CheckUser(isOwner = true, isVote = true)
-    public List<VotePaper> getResult(Long ownerId, Long voteId){   //dto로 변경해서 내보내기
 
-        return voteRepository.findById(voteId).orElseThrow().getPapers();
+
+
+    //이것도 COUNT하는 걸로 바꿉시다 근데 성능테스트 해보자
+    public VoteOutDTO getResult(Long ownerId, Long voteId) {
+        Vote vote = voteRepository.findById(voteId).orElseThrow();
+        List<Object[]> results = votePaperRepository.countVoteResultByType(voteId);
+        Long[] counts = new Long[3]; // 0: yes, 1: no, 2: abstain
+        Arrays.fill(counts, 0L);
+
+        for (Object[] result : results) {
+            VoteResultType type = (VoteResultType) result[0];
+            long count = (Long) result[1];
+
+            switch (type.getDesc()) {
+                case "YES":
+                    counts[0] = count;
+                    break;
+                case "NO":
+                    counts[1] = count;
+                    break;
+                case "ABSTAIN":
+                    counts[2] = count;
+                    break;
+            }
+        }
+        return new VoteOutDTO(voteId, vote.getRoom().getId(),
+                vote.getVoteName(),
+                vote.isActivated(),
+                vote.isAnonymous(),
+                counts[0], counts[1], counts[2],
+                votePaperRepository.getVoteResultDTOByVoteID(voteId));
     }
-
 
     //void 로 바꾸고 Exception 발생
     @CheckUser(isVote = true)
@@ -80,7 +107,7 @@ public class VoteService {
         }
 
         if(votePaperRepository.existsByVoteIdAndUserId(voteId, userId)){
-            throw new DuplicateRequestException();
+            throw new DuplicateRequestException(userId + " already voted to "+ voteId);
         }
 
         VotePaper votePaper = new VotePaper(user ,vote, voteResultType);
@@ -89,10 +116,9 @@ public class VoteService {
 
     //투표들 다 보여주기 vote dto를 내보내는데 찬성수 반대수만
     @CheckUser
-    public List<Vote> getVotes(Long userId, Long roomId){
-        if(roomParticipantRepository.existsByRoomIdAndUserId(roomId, userId)){
-            throw new UserNotInVoteRoomException(String.valueOf(userId));
-        }
-        return voteRepository.findByRoomId(roomId);
+    @Transactional(readOnly = true)
+    public List<VoteOutDTO> getVotes(Long userId, Long roomId){
+
+        return voteRepository.findVoteOutDTOByRoomId(roomId);
     }
 }

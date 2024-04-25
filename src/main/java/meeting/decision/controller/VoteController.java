@@ -1,5 +1,6 @@
 package meeting.decision.controller;
 
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import meeting.decision.argumentresolver.Login;
 import meeting.decision.domain.Vote;
@@ -28,15 +29,15 @@ public class VoteController {
     }
 
     //투표 넣기(방에 있는 사람 권한)
-    @PutMapping("/")
-    public String addVotePaper(@Login Long userId, @RequestBody Long voteId, @RequestBody VoteResultType voteResultType){
-        voteService.addVotePaper(voteId, userId, voteResultType);
+    @PutMapping("/{voteId}")
+    public String addVotePaper(@Login Long userId, @PathVariable Long voteId, @RequestBody VoteResultType voteResultType){
+        voteService.addVotePaper(userId, voteId, voteResultType);
         return "success";
     }
 
     //투표 리셋
     @DeleteMapping("/{voteId}")
-    public String resetVote(@Login Long userId, @PathVariable Long voteId){
+    public String deleteVote(@Login Long userId, @PathVariable Long voteId){
         voteService.delete(userId, voteId);
         return "success";
     }
@@ -47,16 +48,13 @@ public class VoteController {
         return "success";
     }
 
-
-
     @GetMapping("/{voteId}")
-    public List<VotePaper> findVoteResult(@Login Long userId, @PathVariable Long voteId){
+    public VoteOutDTO findVoteResult(@Login Long userId, @PathVariable Long voteId){
         return voteService.getResult(userId, voteId);
     }
 
     @GetMapping("/")
-    public List<Vote> findAllVote(@Login Long userId, @RequestParam("roomId") Long roomId){
+    public List<VoteOutDTO> findAllVote(@Login Long userId, @RequestParam("roomId") Long roomId){
         return voteService.getVotes(userId, roomId);
     }
-
 }
