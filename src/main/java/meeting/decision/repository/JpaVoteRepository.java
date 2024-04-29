@@ -17,8 +17,7 @@ public interface JpaVoteRepository extends JpaRepository<Vote, Long> {
             "v.id, v.room.id, v.voteName, v.isActivated, v.isAnonymous, " +
             "SUM(CASE WHEN vp.voteResultType = meeting.decision.domain.VoteResultType.YES THEN 1 ELSE 0 END), " +
             "SUM(CASE WHEN vp.voteResultType = meeting.decision.domain.VoteResultType.NO THEN 1 ELSE 0 END), " +
-            "SUM(CASE WHEN vp.voteResultType = meeting.decision.domain.VoteResultType.ABSTAIN THEN 1 ELSE 0 END) " +
-            ") " +
+            "SUM(CASE WHEN vp.voteResultType = meeting.decision.domain.VoteResultType.ABSTAIN THEN 1 ELSE 0 END)) " +
             "FROM Vote v " +
             "LEFT JOIN v.papers vp " +
             "WHERE v.room.id = :roomId " +

@@ -70,13 +70,4 @@ public class RoomController {
         roomService.delete(userId, roomId);
         return "delete success";
     }
-
-
-
-
-
-    //
-
-
-
 }

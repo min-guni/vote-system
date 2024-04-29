@@ -10,6 +10,7 @@ import meeting.decision.dto.room.RoomOutDTO;
 import meeting.decision.dto.room.RoomUpdateDTO;
 import meeting.decision.dto.user.UserOutDTO;
 import meeting.decision.exception.DuplicateUserExeption;
+import meeting.decision.exception.UserNotFoundErrorException;
 import meeting.decision.repository.JpaRoomParticipantRepository;
 import meeting.decision.repository.JpaRoomRepository;
 import meeting.decision.repository.JpaUserRepository;
@@ -64,16 +65,18 @@ public class RoomService {
             delete(ownerId, roomId); // 내부 호출 주의
             return;
         }
-        Optional<RoomParticipant> participant = roomParticipantRepository.findByRoomIdAndUserId(roomId, user.getId());
-        if(participant.isEmpty()){
-            return;
-        }
 
-        //Lazy기 때문에 Select Qeury가 나감. 뒤에 더 작업을 안하니 지워줌. ?????? 이걸 해주는게 맞을지 아닐지 .... 고민을 해봅시다...
-//        room.getUserList().remove(roomParticipant);
-//        user.getRoomList().remove(roomParticipant);
-
-        roomParticipantRepository.delete(participant.get());
+    roomParticipantRepository.deleteByRoomIdAndUserId(roomId, userId);
+//        Optional<RoomParticipant> participant = roomParticipantRepository.findByRoomIdAndUserId(roomId, user.getId());
+//        if(participant.isEmpty()){
+//            throw new UserNotFoundErrorException();
+//        }
+//
+//        //Lazy기 때문에 Select Qeury가 나감. 뒤에 더 작업을 안하니 지워줌. ?????? 이걸 해주는게 맞을지 아닐지 .... 고민을 해봅시다...
+//        room.getUserList().remove(participant.get());
+//        user.getRoomList().remove(participant.get());
+//
+//        roomParticipantRepository.delete(participant.get());
 
     }
     //내일 이거 테이블 바꿔보기
@@ -86,15 +89,14 @@ public class RoomService {
         User user = userRepository.findById(userId).orElseThrow();
 
         if(roomParticipantRepository.existsByRoomIdAndUserId(roomId, userId)){
-            throw new DuplicateUserExeption();
+            return;
         }
-        RoomParticipant roomParticipant = new RoomParticipant(room, user); //어짜피 여기서 끝이기 때문에 room이랑 user에 list add안해줌
+        RoomParticipant roomParticipant = new RoomParticipant(room, user);
         roomParticipantRepository.save(roomParticipant);
     }
 
     public List<RoomParticipant> findAllUser(Long roomId){
         return roomRepository.findById(roomId).orElseThrow().getUserList();
-
     }
 
     public List<Room> findAll(){

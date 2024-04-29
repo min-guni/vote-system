@@ -57,7 +57,8 @@ public class VoteService {
     @CheckUser(isOwner = true, isVote = true)
     public void resetVote(Long ownerId, Long voteId){
         Vote vote = voteRepository.findById(voteId).orElseThrow();
-        vote.getPapers().clear();
+        //votePaperRepository.deleteVotePaperByVoteId(voteId);
+        vote.getPapers().clear(); // delete 쿼리 N번 발생
     }
 
     //투표 결과 보여주기 inactivate일때만 보여주기 vote타입에 따라 다름
