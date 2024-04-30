@@ -32,6 +32,9 @@ public class UserService {
     }
     //update
     public void update(Long userId, UserUpdateDTO updateParam){
+        if(repository.findByUsername(updateParam.getUsername()).isPresent()){
+            throw new UsernameAlreadyExistsException(updateParam.getUsername());
+        }
         User updateUser = repository.findById(userId).orElseThrow();
         updateUser.setUsername(updateParam.getUsername());
         updateUser.setHashedPassword(updateParam.getPassword());

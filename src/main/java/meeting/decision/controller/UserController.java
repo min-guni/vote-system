@@ -24,33 +24,16 @@ public class UserController {
     private final JwtTokenProvider jwtTokenProvider;
 
 
-    @PostMapping("/signup")
+    @PostMapping("/")
     public String signUp(@RequestParam("username") String username, @RequestParam("password") String password){
         //암호화
         userService.create(username, passwordEncoder.encode(password));
         return "success";
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<String> logIn(@RequestParam("username") String username, @RequestParam("password") String password, HttpServletRequest request){
-//        //간단하게 토큰기반이 아닌 세션 기반의 로그인 활용
-//        Long userId = userService.checkUser(username, password);
-//        HttpSession session = request.getSession();
-//        session.setAttribute(SessionConst.LOGIN_USER_ID, userId);
-        Long userId = userService.checkUser(username, password);
-        String jwt = jwtTokenProvider.createToken(userId);
-        ResponseCookie jwtCookie = ResponseCookie.from("JWT_TOKEN", jwt)
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .maxAge(3600)
-                .build();
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString()).body("login success");
 
-    }
-
-    @PostMapping("/")
-    public String updateUser(@Login Long userId, UserUpdateDTO updateParam){
+    @PutMapping("/")
+    public String updateUser(@Login Long userId, @RequestBody UserUpdateDTO updateParam){
         log.info(updateParam.getUsername());
         log.info(updateParam.getPassword());
         updateParam.setPassword(passwordEncoder.encode(updateParam.getPassword()));
