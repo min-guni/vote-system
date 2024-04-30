@@ -1,7 +1,10 @@
 # vote-system
 
-Simple Spring Project
+## Simple Spring Project
 
+---
+## STACK
 
-  <img src="https://img.shields.io/badge/java-007396?style=for-the-badge&logo=java&logoColor=white"> 
-  <img src="https://img.shields.io/badge/spring-6DB33F?style=for-the-badge&logo=spring&logoColor=white"> 
+[![stackticon](https://firebasestorage.googleapis.com/v0/b/stackticon-81399.appspot.com/o/images%2F1714452152100?alt=media&token=3815a66d-dff5-443f-920c-717fd48b3718)](https://github.com/msdio/stackticon)
+
+---
