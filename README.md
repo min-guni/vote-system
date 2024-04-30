@@ -10,15 +10,15 @@
 
 
 
-##REST API
+## REST API
 
-###USER
+### USER
 POST /user/  - 회원 가입 기능
 PUT  /user/  - 회원 수정 기능 (Login Token 필요)
 
-###AUTH
+### AUTH
 POST /auth/token - 로그인 기능
 
-###ROOM
+### ROOM
 
-###VOTE
+### VOTE
