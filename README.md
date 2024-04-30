@@ -13,12 +13,19 @@
 ## REST API
 
 ### USER
-POST /user/  - 회원 가입 기능
-PUT  /user/  - 회원 수정 기능 (Login Token 필요)
+- POST /user/  - 회원 가입 기능
+- PUT  /user/  - 회원 수정 기능 (Login Token 필요)
 
 ### AUTH
-POST /auth/token - 로그인 기능
+- POST /auth/token - 로그인 기능
 
-### ROOM
+### ROOM (Login Token 필요)
+- POST /room/ - room 생성 기능
+- GET /room/ - 사용자가 참여하는 ROOM 조회 기능
+- GET /room/{roomId} - 해당 room 의 정보 제공 기능
+- GET /room/{roomId}/users - 해당 room의 참여하고 있는 User 정보 제공 기능
+- PUT /room/{roomId{/user/{userId} - 해당 userId의 user을 roomId 방에 추가 기능
+- DELETE /room/{roomId}/user/{userId} - 해당 userId의 user을 roomId 방에서 삭제 기능
+- DELETE /room/{roomId} - 해당 room 삭제 기능
 
 ### VOTE
