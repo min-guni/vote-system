@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import meeting.decision.argumentresolver.Login;
+import meeting.decision.dto.user.UserOutDTO;
 import meeting.decision.dto.user.UserUpdateDTO;
 import meeting.decision.jwt.JwtTokenProvider;
 import meeting.decision.service.UserService;
@@ -25,10 +26,14 @@ public class UserController {
 
 
     @PostMapping("/")
-    public String signUp(@RequestParam("username") String username, @RequestParam("password") String password){
+    public UserOutDTO signUp(@RequestParam("username") String username, @RequestParam("password") String password){
         //암호화
-        userService.create(username, passwordEncoder.encode(password));
-        return "success";
+        return userService.create(username, passwordEncoder.encode(password));
+    }
+
+    @GetMapping("/me")
+    public UserOutDTO whoAmI(@Login Long userId){
+        return userService.findById(userId);
     }
 
 

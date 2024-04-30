@@ -3,6 +3,7 @@ package meeting.decision.service;
 import lombok.RequiredArgsConstructor;
 import meeting.decision.domain.RoomParticipant;
 import meeting.decision.domain.User;
+import meeting.decision.dto.user.UserOutDTO;
 import meeting.decision.dto.user.UserUpdateDTO;
 import meeting.decision.exception.LoginFailedException;
 import meeting.decision.exception.UsernameAlreadyExistsException;
@@ -22,13 +23,14 @@ public class UserService {
     private final JpaUserRepository repository;
     private final PasswordEncoder passwordEncoder;
     //create
-    public User create(String username, String hassedPassword){
+    public UserOutDTO create(String username, String hassedPassword){
         //이미 같은 username이 있는 지 확인
         Optional<User> byUsername = repository.findByUsername(username);
         if(byUsername.isPresent()){
             throw new UsernameAlreadyExistsException(username);
         }
-        return repository.save(new User(username, hassedPassword));
+        User savedUser = repository.save(new User(username, hassedPassword));
+        return new UserOutDTO(savedUser.getId(), savedUser.getUsername());
     }
     //update
     public void update(Long userId, UserUpdateDTO updateParam){
@@ -40,8 +42,9 @@ public class UserService {
         updateUser.setHashedPassword(updateParam.getPassword());
     }
 
-    public User findById(Long userId){
-        return repository.findById(userId).orElseThrow();
+    public UserOutDTO findById(Long userId){
+        User user = repository.findById(userId).orElseThrow();
+        return new UserOutDTO(user.getId(), user.getUsername());
     }
 
     public Long checkUser(String username, String plainPassword){

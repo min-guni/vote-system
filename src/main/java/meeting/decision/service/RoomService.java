@@ -34,11 +34,11 @@ public class RoomService {
 
 
     //create
-    public Room create(String roomName, Long ownerId){
+    public RoomOutDTO create(String roomName, Long ownerId){
         User owner = userRepository.findById(ownerId).orElseThrow();
         Room room = roomRepository.save(new Room(roomName, owner));
         addUserToRoom(ownerId, room.getId(), ownerId);
-        return room;
+        return new RoomOutDTO(room.getId(), room.getRoomName(), ownerId, 1L);
     }
 
     //update
@@ -109,13 +109,18 @@ public class RoomService {
         return roomRepository.findById(roomId).orElseThrow().getUserList().stream().map((participant -> new UserOutDTO(participant.getUser().getId(), participant.getUser().getUsername()))).collect(Collectors.toList());
     }
 
+    @CheckUser
+    public RoomOutDTO findRoomById(Long userId, Long roomId){
+        return roomParticipantRepository.findRoomOutDTOByRoomId(roomId).orElseThrow();
+    }
+
 
     public List<RoomOutDTO> findAllRoom(){
-        return roomRepository.findAllDTO();
+        return roomParticipantRepository.findAllDTO();
         //return roomRepository.findAll().stream().map(room -> new RoomOutDTO(room.getId(), room.getRoomName(), room.getOwner().getId() ,room.getUserList().size())).collect(Collectors.toList());
     }
 
     public List<RoomOutDTO> findAllRoomByUserId(Long userId){
-        return roomRepository.findByIdDTO(userId);
+        return roomParticipantRepository.findByIdDTO(userId);
     }
 }

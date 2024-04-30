@@ -1,5 +1,7 @@
 package meeting.decision.mock;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import meeting.decision.dto.user.UserOutDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -11,6 +13,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import jakarta.servlet.http.Cookie;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -91,6 +94,15 @@ public class UserTest {
                         .param("username", "myid123")
                         .param("password", "1234"))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testUserMe() throws Exception {
+        Cookie cookie = signupAndLogin("user1", "pass");
+        mockMvc.perform(MockMvcRequestBuilders.get("/user/me")
+                        .cookie(cookie))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("user1"));
     }
 
     private void signup(String username, String password) throws Exception{
