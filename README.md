@@ -26,10 +26,11 @@
 - GET /room/{roomId}/users - 해당 room의 참여하고 있는 User 정보 제공 기능
 - PUT /room/{roomId{/user/{userId} - 해당 userId의 user을 roomId 방에 추가 기능
 - DELETE /room/{roomId}/user/{userId} - 해당 userId의 user을 roomId 방에서 삭제 기능
-- DELETE /room/{roomId} - 해당 room 삭제 기능
+- DELETE /room/{roomId} - 해당 room 삭제 
 
 ### VOTE (Login Token 필요)
 - POST /vote/{roomId} - vote 생성
+- PATCH /vote/{voteId} - 투표 업데이트
 - PUT /vote/{voteId} - 투표하기
 - DELETE /vote/{voteId} - 투표 삭제
 - DELETE /vote/{voteId}/clear - 투표 리셋
