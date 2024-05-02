@@ -31,8 +31,8 @@
 ### VOTE (Login Token 필요)
 - POST /vote/{roomId} - vote 생성
 - PATCH /vote/{voteId} - 투표 업데이트
-- PUT /vote/{voteId} - 투표하기
+- PUT /votePaper/{voteId} - 투표하기
 - DELETE /vote/{voteId} - 투표 삭제
-- DELETE /vote/{voteId}/clear - 투표 리셋
-- GET /vote/{voteId} - 투표 결과
-- GET /vote/?roomId= - 해당 방 전체 투표 결과
+- DELETE /votePaper/{voteId} - 투표 리셋
+- GET /votePaper/{voteId} - 투표 결과
+- GET /vote/{roomId} - 해당 방 전체 투표 결과
