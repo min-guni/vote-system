@@ -24,7 +24,6 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class VoteController {
 
-    private final RoomService roomService;
     private final VoteService voteService;
     //투표생성(방장권한)
 
@@ -35,15 +34,8 @@ public class VoteController {
     }
 
     @PatchMapping("/{voteId}")
-    public String updateVote(@Login Long userId, @PathVariable Long voteId, @RequestBody VoteUpdateDTO voteUpdateDTO){
+    public String updateVote(@Login Long userId, @PathVariable Long voteId, @RequestBody VoteUpdateDTO voteUpdateDTO) {
         voteService.update(userId, voteId, voteUpdateDTO);
-        return "success";
-    }
-
-    //투표 넣기(방에 있는 사람 권한)
-    @PutMapping("/{voteId}")
-    public String addVotePaper(@Login Long userId, @PathVariable Long voteId, @RequestBody VoteResultType voteResultType){
-        voteService.addVotePaper(userId, voteId, voteResultType);
         return "success";
     }
 
@@ -54,19 +46,9 @@ public class VoteController {
         return "success";
     }
 
-    @PostMapping("/{voteId}/reset")
-    public String clearVote(@Login Long userId, @PathVariable Long voteId){
-        voteService.resetVote(userId, voteId);
-        return "success";
-    }
 
-    @GetMapping("/{voteId}")
-    public VoteOutDTO findVoteResult(@Login Long userId, @PathVariable Long voteId){
-        return voteService.getResult(userId, voteId);
-    }
-
-    @GetMapping("/")
-    public List<VoteOutDTO> findAllVote(@Login Long userId, @RequestParam("roomId") Long roomId){
+    @GetMapping("/{roomId}")
+    public List<VoteOutDTO> findAllVote(@Login Long userId, @PathVariable("roomId") Long roomId){
         return voteService.getVotes(userId, roomId);
     }
 }

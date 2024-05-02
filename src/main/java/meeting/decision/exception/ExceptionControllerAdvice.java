@@ -29,7 +29,7 @@ public class ExceptionControllerAdvice {
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(RoomNotFoundException.class)
+    @ExceptionHandler({RoomNotFoundException.class,VoteNotFoundException.class})
     public String notFoundExHandle(RuntimeException e) {return e.getMessage();}
 
     @ResponseStatus(HttpStatus.FORBIDDEN)

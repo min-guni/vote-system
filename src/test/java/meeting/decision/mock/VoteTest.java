@@ -92,7 +92,7 @@ public class VoteTest {
         for(int i = 0; i < num; i++){
             int randomNum = random.nextInt(3);
             Cookie myCookie = login("adduser" + i, "password" + i);
-            mockMvc.perform(MockMvcRequestBuilders.put("/vote/" + voteOutDTO.getId())
+            mockMvc.perform(MockMvcRequestBuilders.put("/votePaper/" + voteOutDTO.getId())
                             .cookie(myCookie)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(("\"" + voteVal[randomNum] + "\"")))
@@ -100,7 +100,7 @@ public class VoteTest {
             saveVoteList[randomNum] ++;
         }
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/vote/" + voteOutDTO.getId())
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/votePaper/" + voteOutDTO.getId())
                         .cookie(cookie))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -154,7 +154,7 @@ public class VoteTest {
         for(int i = 0; i < num; i++){
             int randomNum = random.nextInt(3);
             Cookie myCookie = login("adduser" + i, "password" + i);
-            mockMvc.perform(MockMvcRequestBuilders.put("/vote/" + voteOutDTO.getId())
+            mockMvc.perform(MockMvcRequestBuilders.put("/votePaper/" + voteOutDTO.getId())
                             .cookie(myCookie)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(("\"" + voteVal[randomNum] + "\"")))
@@ -162,7 +162,7 @@ public class VoteTest {
             saveVoteList[randomNum] ++;
         }
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/vote/" + voteOutDTO.getId())
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/votePaper/" + voteOutDTO.getId())
                         .cookie(cookie))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -231,14 +231,14 @@ public class VoteTest {
         for(int i = 0; i < num; i++){
             int randomNum = random.nextInt(3);
             Cookie myCookie = login("adduser" + i, "password" + i);
-            mockMvc.perform(MockMvcRequestBuilders.put("/vote/" + voteOutDTO.getId())
+            mockMvc.perform(MockMvcRequestBuilders.put("/votePaper/" + voteOutDTO.getId())
                             .cookie(myCookie)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(("\"" + voteVal[randomNum] + "\"")))
                     .andExpect(status().isForbidden());
         }
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/vote/" + voteOutDTO.getId())
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/votePaper/" + voteOutDTO.getId())
                         .cookie(cookie))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -283,7 +283,7 @@ public class VoteTest {
         }
         Cookie cookie1 = signupAndLogin("notRoomUser", "a");
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/vote/" + voteOutDTO.getId())
+        mockMvc.perform(MockMvcRequestBuilders.put("/votePaper/" + voteOutDTO.getId())
                         .cookie(cookie1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(("\"YES\"")))
@@ -331,7 +331,7 @@ public class VoteTest {
             for (int i = 0; i < num; i++) {
                 int randomNum = random.nextInt(3);
                 Cookie myCookie = login("adduser" + i, "password" + i);
-                mockMvc.perform(MockMvcRequestBuilders.put("/vote/" + voteId)
+                mockMvc.perform(MockMvcRequestBuilders.put("/votePaper/" + voteId)
                                 .cookie(myCookie)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(("\"" + voteVal[randomNum] + "\"")))
@@ -341,9 +341,8 @@ public class VoteTest {
             voteResultMap.put(voteId, voteResultArr);
         }
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/vote/")
-                        .cookie(cookie)
-                        .param("roomId", String.valueOf(roomOutDTO.getRoomId())))
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/vote/" + roomOutDTO.getRoomId())
+                        .cookie(cookie))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -397,7 +396,7 @@ public class VoteTest {
         for(int i = 0; i < num; i++){
             int randomNum = random.nextInt(3);
             Cookie myCookie = login("adduser" + i, "password" + i);
-            mockMvc.perform(MockMvcRequestBuilders.put("/vote/" + voteOutDTO.getId())
+            mockMvc.perform(MockMvcRequestBuilders.put("/votePaper/" + voteOutDTO.getId())
                             .cookie(myCookie)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(("\"" + voteVal[randomNum] + "\"")))
@@ -408,14 +407,14 @@ public class VoteTest {
         for(int i = 0; i < num; i++){
             int randomNum = random.nextInt(3);
             Cookie myCookie = login("adduser" + i, "password" + i);
-            mockMvc.perform(MockMvcRequestBuilders.put("/vote/" + voteOutDTO.getId())
+            mockMvc.perform(MockMvcRequestBuilders.put("/votePaper/" + voteOutDTO.getId())
                             .cookie(myCookie)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(("\"" + voteVal[randomNum] + "\"")))
                     .andExpect(status().isOk());
         }
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/vote/" + voteOutDTO.getId())
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/votePaper/" + voteOutDTO.getId())
                         .cookie(cookie))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -437,6 +436,121 @@ public class VoteTest {
         assertThat(voteResultIds.size()).isEqualTo(10);
     }
 
+
+    @Test
+    @DisplayName("투표 삭제 테스트")
+    void deleteVoteTest() throws Exception {
+        UserOutDTO user1 = signup("user1", "a");
+        Cookie cookie = login("user1", "a");
+
+
+        RoomOutDTO roomOutDTO = makeRoom("room", cookie);
+        VoteInDTO voteInput = new VoteInDTO("vote1", false);
+        VoteOutDTO voteOutDTO = createVote(voteInput, roomOutDTO.getRoomId(), cookie);
+
+
+        int num = 10;
+        Map<Long, UserOutDTO> addDTOList = new HashMap<>();
+        for (int i = 0; i < num; i++) {
+            UserOutDTO user = signup("adduser" + i, "password" + i);
+            addDTOList.put(user.getId(), user);
+        }
+
+        for(Long id : addDTOList.keySet()){
+            mockMvc.perform(MockMvcRequestBuilders.put("/room/" + roomOutDTO.getRoomId() + "/user/" + id)
+                            .cookie(cookie))
+                    .andExpect(status().isOk());
+        }
+
+
+        int[] saveVoteList = new int[3];
+        String[] voteVal = {"YES", "NO", "ABSTAIN"};
+        Random random = new Random();
+
+        for(int i = 0; i < num; i++){
+            int randomNum = random.nextInt(3);
+            Cookie myCookie = login("adduser" + i, "password" + i);
+            mockMvc.perform(MockMvcRequestBuilders.put("/votePaper/" + voteOutDTO.getId())
+                            .cookie(myCookie)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(("\"" + voteVal[randomNum] + "\"")))
+                    .andExpect(status().isOk());
+            saveVoteList[randomNum] ++;
+        }
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/vote/" + voteOutDTO.getId())
+                .cookie(cookie))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/votePaper/" + voteOutDTO.getId())
+                        .cookie(cookie))
+                .andExpect(status().isNotFound())
+                .andReturn();
+    }
+
+    @Test
+    @DisplayName("투표 리셋 테스트")
+    void voteResetTest() throws Exception {
+        UserOutDTO user1 = signup("user1", "a");
+        Cookie cookie = login("user1", "a");
+
+
+        RoomOutDTO roomOutDTO = makeRoom("room", cookie);
+        VoteInDTO voteInput = new VoteInDTO("vote1", false);
+        VoteOutDTO voteOutDTO = createVote(voteInput, roomOutDTO.getRoomId(), cookie);
+
+
+        int num = 10;
+        Map<Long, UserOutDTO> addDTOList = new HashMap<>();
+        for (int i = 0; i < num; i++) {
+            UserOutDTO user = signup("adduser" + i, "password" + i);
+            addDTOList.put(user.getId(), user);
+        }
+
+        for(Long id : addDTOList.keySet()){
+            mockMvc.perform(MockMvcRequestBuilders.put("/room/" + roomOutDTO.getRoomId() + "/user/" + id)
+                            .cookie(cookie))
+                    .andExpect(status().isOk());
+        }
+
+
+        int[] saveVoteList = new int[3];
+        String[] voteVal = {"YES", "NO", "ABSTAIN"};
+        Random random = new Random();
+
+        for(int i = 0; i < num; i++){
+            int randomNum = random.nextInt(3);
+            Cookie myCookie = login("adduser" + i, "password" + i);
+            mockMvc.perform(MockMvcRequestBuilders.put("/votePaper/" + voteOutDTO.getId())
+                            .cookie(myCookie)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(("\"" + voteVal[randomNum] + "\"")))
+                    .andExpect(status().isOk());
+            saveVoteList[randomNum] ++;
+        }
+
+        em.clear();
+        long start = System.currentTimeMillis();
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/votePaper/" + voteOutDTO.getId())
+                        .cookie(cookie))
+                .andExpect(status().isOk());
+
+        long end = System.currentTimeMillis();
+
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/votePaper/" + voteOutDTO.getId())
+                        .cookie(cookie))
+                .andExpect(status().isOk())
+                .andReturn();
+        String content = result.getResponse().getContentAsString();
+        VoteOutDTO voteOutDTO1 = objectMapper.readValue(content, VoteOutDTO.class);
+        assertThat(voteOutDTO1.getVoteResult().get().size()).isEqualTo(0);
+        assertThat(voteOutDTO1.getNoNum()).isEqualTo(0);
+        assertThat(voteOutDTO1.getYesNum()).isEqualTo(0);
+        assertThat(voteOutDTO1.getAbstentionNum()).isEqualTo(0);
+        System.out.println(start - end);
+    }
 
     private RoomOutDTO makeRoom(String roomName, Cookie cookie) throws Exception {
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/room/")

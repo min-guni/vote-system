@@ -51,6 +51,7 @@ public class VoteService {
 
     @CheckUser(isOwner = true, isVote = true)
     public void delete(Long ownerId, Long voteId){
+        votePaperRepository.deleteVotePaperByVoteId(voteId);
         voteRepository.deleteById(voteId);
     }
 
@@ -58,7 +59,7 @@ public class VoteService {
     @CheckUser(isOwner = true, isVote = true)
     public void resetVote(Long ownerId, Long voteId){
         Vote vote = voteRepository.findById(voteId).orElseThrow(VoteNotFoundException::new);
-        //votePaperRepository.deleteVotePaperByVoteId(voteId);
+        votePaperRepository.deleteVotePaperByVoteId(voteId);
         vote.getPapers().clear(); // delete 쿼리 N번 발생
     }
 

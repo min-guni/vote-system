@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import meeting.decision.annotation.CheckUser;
 import meeting.decision.exception.RoomNotFoundException;
+import meeting.decision.exception.VoteNotFoundException;
 import meeting.decision.repository.JpaRoomParticipantRepository;
 import meeting.decision.repository.JpaRoomRepository;
 import meeting.decision.repository.JpaVoteRepository;
@@ -38,7 +39,7 @@ public class CheckUserAop {
 
 
         if(annotation.isVote()){
-            roomIdOrVoteId = voteRepository.findById(roomIdOrVoteId).orElseThrow().getRoom().getId();
+            roomIdOrVoteId = voteRepository.findById(roomIdOrVoteId).orElseThrow(VoteNotFoundException::new).getRoom().getId();
         }
 
 
