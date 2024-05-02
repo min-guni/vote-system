@@ -1,9 +1,12 @@
 package meeting.decision.dto.vote;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@ToString
 public class VoteUpdateDTO {
     private String voteName;
-    private boolean isActivated;
+    private boolean activated;
 }

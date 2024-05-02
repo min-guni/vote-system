@@ -32,7 +32,7 @@ public class QVote extends EntityPathBase<Vote> {
 
     public final QRoom room;
 
-    public final DateTimePath<java.time.LocalDateTime> timeStamp = createDateTime("timeStamp", java.time.LocalDateTime.class);
+    public final DateTimePath<java.time.LocalDateTime> startTime = createDateTime("startTime", java.time.LocalDateTime.class);
 
     public final StringPath voteName = createString("voteName");
 

@@ -16,7 +16,6 @@ public class ExceptionControllerAdvice {
     @ExceptionHandler({UsernameAlreadyExistsException.class,
             NoSuchElementException.class,
             DuplicateRequestException.class,
-            VoteIsNotActivatedException.class,
             VoteResultTypeEnumParseException.class,
             DuplicateUserExeption.class})
     public String BadRequestExHandle(Exception e) {
@@ -29,9 +28,13 @@ public class ExceptionControllerAdvice {
         return e.getMessage();
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(RoomNotFoundException.class)
+    public String notFoundExHandle(RuntimeException e) {return e.getMessage();}
+
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ExceptionHandler(AuthorizationServiceException.class)
-    public String forbiddenHandle(AuthorizationServiceException e){
+    @ExceptionHandler({VoteIsNotActivatedException.class,AuthorizationServiceException.class})
+    public String forbiddenHandle(RuntimeException e){
         return e.getMessage();
     }
 

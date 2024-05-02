@@ -3,6 +3,7 @@ package meeting.decision.aop;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import meeting.decision.annotation.CheckUser;
+import meeting.decision.exception.RoomNotFoundException;
 import meeting.decision.repository.JpaRoomParticipantRepository;
 import meeting.decision.repository.JpaRoomRepository;
 import meeting.decision.repository.JpaVoteRepository;
@@ -34,7 +35,7 @@ public class CheckUserAop {
 
     @Before("checkUserAnnotation() && isService() && @annotation(annotation) && args(userId,roomIdOrVoteId,..)")
     public void CheckUser(CheckUser annotation, Long userId, Long roomIdOrVoteId){
-        log.info("[CheckUserAOP] userId : {} , roomIdOrVoteId {}", userId, roomIdOrVoteId);
+
 
         if(annotation.isVote()){
             roomIdOrVoteId = voteRepository.findById(roomIdOrVoteId).orElseThrow().getRoom().getId();
@@ -49,6 +50,7 @@ public class CheckUserAop {
         }
         else{
             if(!participantRepository.existsByRoomIdAndUserId(roomIdOrVoteId,userId)){
+                roomRepository.findById(roomIdOrVoteId).orElseThrow(RoomNotFoundException::new);
                 throw new AuthorizationServiceException("YOU ARE NOT IN " +roomIdOrVoteId + " ROOM");
             }
         }

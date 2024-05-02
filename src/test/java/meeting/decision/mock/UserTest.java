@@ -1,7 +1,9 @@
 package meeting.decision.mock;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import meeting.decision.argumentresolver.Login;
 import meeting.decision.dto.user.UserOutDTO;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -26,11 +28,12 @@ public class UserTest {
 
 
     @Test
+    @DisplayName("중복 닉네임 확인 테스트")
     public void testDuplicateUsername() throws Exception {
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/user/")
                         .param("username", "minguni123")
                         .param("password", "1234"))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andReturn();
 
         MvcResult result2 = mockMvc.perform(MockMvcRequestBuilders.post("/user/")
@@ -40,7 +43,9 @@ public class UserTest {
                 .andReturn();
     }
 
+    
     @Test
+    @DisplayName("로그인 테스트")
     void testLogin() throws Exception{
         signup("1", "1");
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/token")
@@ -60,11 +65,12 @@ public class UserTest {
     }
 
     @Test
+    @DisplayName("유저 업데이트 테스트")
     public void testUserUpdate() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/user/")
                         .param("username", "myid")
                         .param("password", "1234"))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
         Cookie cookie = signupAndLogin("ming", "1234");
 
         //no cookie
@@ -97,6 +103,7 @@ public class UserTest {
     }
 
     @Test
+    @DisplayName("자기 자신 정보 확인 테스트")
     void testUserMe() throws Exception {
         Cookie cookie = signupAndLogin("user1", "pass");
         mockMvc.perform(MockMvcRequestBuilders.get("/user/me")
@@ -109,7 +116,7 @@ public class UserTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/user/")
                         .param("username", username)
                         .param("password", password))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
     }
 
 

@@ -28,4 +28,8 @@ public interface JpaVotePaperRepository extends JpaRepository<VotePaper, Long> {
       @Query("DELETE FROM VotePaper vp WHERE vp.vote = :voteId")
       void deleteVotePaperByVoteId(Long voteId);
 
+      @Modifying
+      @Query("DELETE FROM VotePaper vp WHERE vp.vote.room.id = :roomId")
+      void deleteVotePaperByRoomId(Long roomId);
+
 }

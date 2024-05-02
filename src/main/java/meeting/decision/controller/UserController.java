@@ -9,6 +9,7 @@ import meeting.decision.dto.user.UserUpdateDTO;
 import meeting.decision.jwt.JwtTokenProvider;
 import meeting.decision.service.UserService;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +27,7 @@ public class UserController {
 
 
     @PostMapping("/")
+    @ResponseStatus(HttpStatus.CREATED)
     public UserOutDTO signUp(@RequestParam("username") String username, @RequestParam("password") String password){
         //암호화
         return userService.create(username, passwordEncoder.encode(password));

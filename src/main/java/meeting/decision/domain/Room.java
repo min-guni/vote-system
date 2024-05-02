@@ -33,7 +33,7 @@ public class Room {
 
 
     //vote모아둬야됨
-    @OneToMany(mappedBy = "room")
+    @OneToMany(mappedBy = "room", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Vote> voteList = new ArrayList<>();
 
     public Room(String roomName, User owner) {

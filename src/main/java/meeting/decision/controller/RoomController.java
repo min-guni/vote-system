@@ -6,6 +6,7 @@ import meeting.decision.dto.room.RoomOutDTO;
 import meeting.decision.dto.room.RoomUpdateDTO;
 import meeting.decision.dto.user.UserOutDTO;
 import meeting.decision.service.RoomService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class RoomController {
     private final RoomService roomService;
     //방생성
     @PostMapping("/")
+    @ResponseStatus(HttpStatus.CREATED)
     public RoomOutDTO createRoom(@Login Long userId, @RequestBody String roomName){
         return roomService.create(roomName, userId);
     }

@@ -2,14 +2,14 @@ package meeting.decision.service;
 
 import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import meeting.decision.annotation.CheckUser;
 import meeting.decision.domain.*;
 import meeting.decision.dto.vote.VoteInDTO;
 import meeting.decision.dto.vote.VoteOutDTO;
-import meeting.decision.dto.vote.VoteResultDTO;
 import meeting.decision.dto.vote.VoteUpdateDTO;
-import meeting.decision.exception.UserNotInVoteRoomException;
 import meeting.decision.exception.VoteIsNotActivatedException;
+import meeting.decision.exception.VoteNotFoundException;
 import meeting.decision.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +20,7 @@ import java.util.*;
 @Transactional
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class VoteService {
     //create
     private final JpaVoteRepository voteRepository;
@@ -42,7 +43,7 @@ public class VoteService {
 
     @CheckUser(isOwner = true, isVote = true)
     public void update(Long ownerId, Long voteId, VoteUpdateDTO updateParam){
-        Vote vote = voteRepository.findById(voteId).orElseThrow();
+        Vote vote = voteRepository.findById(voteId).orElseThrow(VoteNotFoundException::new);
         vote.setVoteName(updateParam.getVoteName());
         vote.setActivated(updateParam.isActivated());
     }
@@ -56,7 +57,7 @@ public class VoteService {
     //reset VotePaper
     @CheckUser(isOwner = true, isVote = true)
     public void resetVote(Long ownerId, Long voteId){
-        Vote vote = voteRepository.findById(voteId).orElseThrow();
+        Vote vote = voteRepository.findById(voteId).orElseThrow(VoteNotFoundException::new);
         //votePaperRepository.deleteVotePaperByVoteId(voteId);
         vote.getPapers().clear(); // delete 쿼리 N번 발생
     }
@@ -66,8 +67,9 @@ public class VoteService {
 
 
     //이것도 COUNT하는 걸로 바꿉시다 근데 성능테스트 해보자
-    public VoteOutDTO getResult(Long ownerId, Long voteId) {
-        Vote vote = voteRepository.findById(voteId).orElseThrow();
+    @CheckUser(isVote = true)
+    public VoteOutDTO getResult(Long userId, Long voteId) {
+        Vote vote = voteRepository.findById(voteId).orElseThrow(VoteNotFoundException::new);
         List<Object[]> results = votePaperRepository.countVoteResultByType(voteId);
         Long[] counts = new Long[3]; // 0: yes, 1: no, 2: abstain
         Arrays.fill(counts, 0L);
@@ -88,12 +90,21 @@ public class VoteService {
                     break;
             }
         }
-        return new VoteOutDTO(voteId, vote.getRoom().getId(),
-                vote.getVoteName(),
-                vote.isActivated(),
-                vote.isAnonymous(),
-                counts[0], counts[1], counts[2],
-                votePaperRepository.getVoteResultDTOByVoteID(voteId));
+        if(vote.isAnonymous()){
+            return new VoteOutDTO(voteId, vote.getRoom().getId(),
+                    vote.getVoteName(),
+                    vote.isActivated(),
+                    true,
+                    counts[0], counts[1], counts[2],null);
+        }
+        else{
+            return new VoteOutDTO(voteId, vote.getRoom().getId(),
+                    vote.getVoteName(),
+                    vote.isActivated(),
+                    false,
+                    counts[0], counts[1], counts[2],
+                    Optional.ofNullable(votePaperRepository.getVoteResultDTOByVoteID(voteId)));
+        }
     }
 
     //void 로 바꾸고 Exception 발생
@@ -101,14 +112,15 @@ public class VoteService {
     public void addVotePaper(Long userId, Long voteId, VoteResultType voteResultType){
         //이미 투표에 투표있는지 확인 있는지 확인 있으면 false 반환
         User user = userRepository.findById(userId).orElseThrow();
-        Vote vote = voteRepository.findById(voteId).orElseThrow();
+        Vote vote = voteRepository.findById(voteId).orElseThrow(VoteNotFoundException::new);
+
 
         if(!vote.isActivated()){
             throw new VoteIsNotActivatedException(voteId + "vote is not activated");
         }
 
         if(votePaperRepository.existsByVoteIdAndUserId(voteId, userId)){
-            throw new DuplicateRequestException(userId + " already voted to "+ voteId);
+            return;
         }
 
         VotePaper votePaper = new VotePaper(user ,vote, voteResultType);

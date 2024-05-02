@@ -2,16 +2,13 @@ package meeting.decision.domain;
 
 
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Getter @Setter
@@ -33,7 +30,7 @@ public class Vote {
     private List<VotePaper> papers = new ArrayList<>();
 
 
-    private LocalDateTime timeStamp;
+    private LocalDateTime startTime;
 
     private boolean isAnonymous;
     private boolean isActivated;
@@ -44,6 +41,6 @@ public class Vote {
         this.room = room;
         this.isAnonymous = isAnonymous;
         this.isActivated = true;
-        this.timeStamp = LocalDateTime.now();
+        this.startTime = LocalDateTime.now();
     }
 }
