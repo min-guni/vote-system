@@ -1,4 +1,4 @@
-package meeting.decision.exception;
+package meeting.decision.exception.exceptions;
 
 public class VoteNotFoundException extends RuntimeException{
     public VoteNotFoundException() {

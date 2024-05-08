@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -13,6 +14,5 @@ public class RoomOutDTO {
     private String roomName;
     private Long ownerId;
     private Long userNum = 0L;
-
-
+    private LocalDateTime createTime;
 }

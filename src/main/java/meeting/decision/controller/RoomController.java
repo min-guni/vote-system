@@ -7,6 +7,7 @@ import meeting.decision.dto.room.RoomUpdateDTO;
 import meeting.decision.dto.user.UserOutDTO;
 import meeting.decision.service.RoomService;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -50,13 +51,12 @@ public class RoomController {
 
     //인원 삭제(방장권한)없으면 403
     @DeleteMapping("/{roomId}/user/{deleteId}")
-    public String deleteUser(@Login Long userId,@PathVariable Long roomId, @PathVariable Long deleteId){
+    public void deleteUser(@Login Long userId, @PathVariable Long roomId, @PathVariable Long deleteId){
         roomService.deleteUserFromRoom(userId, roomId, deleteId);
-        return "success";
     }
 
     @PutMapping("/{roomId}")
-    public String update(@Login Long userId, @PathVariable Long roomId, @RequestBody RoomUpdateDTO roomUpdateDTO) {
+    public String update(@Login Long userId, @PathVariable Long roomId, @Validated @RequestBody RoomUpdateDTO roomUpdateDTO) {
         roomService.update(userId, roomId, roomUpdateDTO);
         return "success";
     }

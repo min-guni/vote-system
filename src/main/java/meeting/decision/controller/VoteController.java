@@ -13,6 +13,7 @@ import meeting.decision.dto.vote.VoteUpdateDTO;
 import meeting.decision.service.RoomService;
 import meeting.decision.service.VoteService;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,12 +30,12 @@ public class VoteController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{roomId}")
-    public VoteOutDTO createVote(@Login Long userId, @PathVariable Long roomId, @RequestBody VoteInDTO voteDTO){
+    public VoteOutDTO createVote(@Login Long userId, @PathVariable Long roomId, @Validated @RequestBody VoteInDTO voteDTO){
         return voteService.create(userId, roomId, voteDTO);
     }
 
     @PatchMapping("/{voteId}")
-    public String updateVote(@Login Long userId, @PathVariable Long voteId, @RequestBody VoteUpdateDTO voteUpdateDTO) {
+    public String updateVote(@Login Long userId, @PathVariable Long voteId, @Validated @RequestBody VoteUpdateDTO voteUpdateDTO) {
         voteService.update(userId, voteId, voteUpdateDTO);
         return "success";
     }

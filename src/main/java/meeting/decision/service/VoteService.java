@@ -1,6 +1,5 @@
 package meeting.decision.service;
 
-import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import meeting.decision.annotation.CheckUser;
@@ -8,8 +7,9 @@ import meeting.decision.domain.*;
 import meeting.decision.dto.vote.VoteInDTO;
 import meeting.decision.dto.vote.VoteOutDTO;
 import meeting.decision.dto.vote.VoteUpdateDTO;
-import meeting.decision.exception.VoteIsNotActivatedException;
-import meeting.decision.exception.VoteNotFoundException;
+import meeting.decision.exception.exceptions.UserNotInRoomException;
+import meeting.decision.exception.exceptions.VoteIsNotActivatedException;
+import meeting.decision.exception.exceptions.VoteNotFoundException;
 import meeting.decision.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +37,7 @@ public class VoteService {
         return new VoteOutDTO(savedVote.getId(),
                 roomId, savedVote.getVoteName(),
                 savedVote.isActivated(), savedVote.isAnonymous(),
-                0L,0L, 0L);
+                0L,0L, 0L, room.getCreateTime());
 
     }
 
@@ -96,7 +96,7 @@ public class VoteService {
                     vote.getVoteName(),
                     vote.isActivated(),
                     true,
-                    counts[0], counts[1], counts[2],null);
+                    counts[0], counts[1], counts[2],vote.getStartTime());
         }
         else{
             return new VoteOutDTO(voteId, vote.getRoom().getId(),
@@ -104,7 +104,7 @@ public class VoteService {
                     vote.isActivated(),
                     false,
                     counts[0], counts[1], counts[2],
-                    Optional.ofNullable(votePaperRepository.getVoteResultDTOByVoteID(voteId)));
+                    Optional.ofNullable(votePaperRepository.getVoteResultDTOByVoteID(voteId)), vote.getStartTime());
         }
     }
 
@@ -118,6 +118,10 @@ public class VoteService {
 
         if(!vote.isActivated()){
             throw new VoteIsNotActivatedException(voteId + "vote is not activated");
+        }
+
+        if(!roomParticipantRepository.existsByRoomIdAndUserId(vote.getRoom().getId(), userId)){
+            throw new UserNotInRoomException(userId);
         }
 
         if(votePaperRepository.existsByVoteIdAndUserId(voteId, userId)){

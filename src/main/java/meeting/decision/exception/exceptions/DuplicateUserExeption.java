@@ -1,4 +1,4 @@
-package meeting.decision.exception;
+package meeting.decision.exception.exceptions;
 
 public class DuplicateUserExeption extends RuntimeException{
     public DuplicateUserExeption() {

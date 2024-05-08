@@ -48,8 +48,8 @@ public class VoteTest {
     @Test
     @DisplayName("Vote 생성 테스트")
     void createVoteTest() throws Exception {
-        UserOutDTO user1 = signup("user1", "a");
-        Cookie cookie = login("user1", "a");
+        UserOutDTO user1 = signup("userid1", "password");
+        Cookie cookie = login("userid1", "password");
 
 
         RoomOutDTO roomOutDTO = makeRoom("room", cookie);
@@ -60,10 +60,64 @@ public class VoteTest {
     }
 
     @Test
+    @DisplayName("Vote 생성 테스트 validation : 투표 이름이 공백이면 안됨")
+    void createVoteValidationTest() throws Exception {
+        UserOutDTO user1 = signup("userid1", "password");
+        Cookie cookie = login("userid1", "password");
+
+
+        RoomOutDTO roomOutDTO = makeRoom("room", cookie);
+        VoteInDTO voteInput = new VoteInDTO("    ", false);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/vote/" + roomOutDTO.getRoomId())
+                        .cookie(cookie)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(voteInput)))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+
+        VoteInDTO voteInput1 = new VoteInDTO("", false);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/vote/" + roomOutDTO.getRoomId())
+                        .cookie(cookie)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(voteInput1)))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/vote/" + roomOutDTO.getRoomId())
+                        .cookie(cookie))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+    }
+
+    @Test
+    @DisplayName("Vote 생성 테스트 auth : 투표는 방장만이 생성할 수 있음")
+    void createVoteAuthTest() throws Exception {
+        UserOutDTO user1 = signup("userid1", "password");
+        Cookie cookie1 = login("userid1", "password");
+
+
+        UserOutDTO user2 = signup("userid2", "password");
+        Cookie cookie2 = login("userid2", "password");
+
+        RoomOutDTO roomOutDTO = makeRoom("room", cookie1);
+        VoteInDTO voteInput = new VoteInDTO("vote", false);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/vote/" + roomOutDTO.getRoomId())
+                        .cookie(cookie2)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(voteInput)))
+                .andExpect(status().isForbidden())
+                .andReturn();
+    }
+
+    @Test
     @DisplayName("Vote 결과 테스트")
     void voteResultTest() throws Exception {
-        UserOutDTO user1 = signup("user1", "a");
-        Cookie cookie = login("user1", "a");
+        UserOutDTO user1 = signup("userid1", "password");
+        Cookie cookie = login("userid1", "password");
 
 
         RoomOutDTO roomOutDTO = makeRoom("room", cookie);
@@ -124,8 +178,8 @@ public class VoteTest {
     @Test
     @DisplayName("익명 테스트")
     void anonymousTest() throws Exception {
-        UserOutDTO user1 = signup("user1", "a");
-        Cookie cookie = login("user1", "a");
+        UserOutDTO user1 = signup("userid1", "password");
+        Cookie cookie = login("userid1", "password");
 
 
         RoomOutDTO roomOutDTO = makeRoom("room", cookie);
@@ -182,8 +236,8 @@ public class VoteTest {
     @Test
     @DisplayName("Vote update and inactivate Test")
     void voteInActivateTest() throws Exception {
-        UserOutDTO user1 = signup("user1", "a");
-        Cookie cookie = login("user1", "a");
+        UserOutDTO user1 = signup("userid1", "password");
+        Cookie cookie = login("userid1", "password");
 
 
         RoomOutDTO roomOutDTO = makeRoom("room", cookie);
@@ -260,8 +314,8 @@ public class VoteTest {
     @Test
     @DisplayName("Vote Authorize test1 : 방안에 있는 사람만 투표 가능")
     void voteAuthTest1() throws Exception {
-        UserOutDTO user1 = signup("user1", "a");
-        Cookie cookie = login("user1", "a");
+        UserOutDTO user1 = signup("userid1", "password");
+        Cookie cookie = login("userid1", "password");
 
 
         RoomOutDTO roomOutDTO = makeRoom("room", cookie);
@@ -281,7 +335,7 @@ public class VoteTest {
                             .cookie(cookie))
                     .andExpect(status().isOk());
         }
-        Cookie cookie1 = signupAndLogin("notRoomUser", "a");
+        Cookie cookie1 = signupAndLogin("notRoomUser", "password");
 
         mockMvc.perform(MockMvcRequestBuilders.put("/votePaper/" + voteOutDTO.getId())
                         .cookie(cookie1)
@@ -294,8 +348,8 @@ public class VoteTest {
     @Test
     @DisplayName("Vote List Test")
     void voteListTest() throws Exception {
-        UserOutDTO user1 = signup("user1", "a");
-        Cookie cookie = login("user1", "a");
+        UserOutDTO user1 = signup("userid1", "password");
+        Cookie cookie = login("userid1", "password");
 
 
         RoomOutDTO roomOutDTO = makeRoom("room", cookie);
@@ -366,8 +420,8 @@ public class VoteTest {
     @DisplayName("두번 투표를 해도 한번만 처리가 됨")
     void duplicateVoteTest() throws Exception {
 
-        UserOutDTO user1 = signup("user1", "a");
-        Cookie cookie = login("user1", "a");
+        UserOutDTO user1 = signup("userid1", "password");
+        Cookie cookie = login("userid1", "password");
 
 
         RoomOutDTO roomOutDTO = makeRoom("room", cookie);
@@ -440,8 +494,8 @@ public class VoteTest {
     @Test
     @DisplayName("투표 삭제 테스트")
     void deleteVoteTest() throws Exception {
-        UserOutDTO user1 = signup("user1", "a");
-        Cookie cookie = login("user1", "a");
+        UserOutDTO user1 = signup("userid1", "password");
+        Cookie cookie = login("userid1", "password");
 
 
         RoomOutDTO roomOutDTO = makeRoom("room", cookie);
@@ -491,8 +545,8 @@ public class VoteTest {
     @Test
     @DisplayName("투표 리셋 테스트")
     void voteResetTest() throws Exception {
-        UserOutDTO user1 = signup("user1", "a");
-        Cookie cookie = login("user1", "a");
+        UserOutDTO user1 = signup("userid1", "password");
+        Cookie cookie = login("userid1", "password");
 
 
         RoomOutDTO roomOutDTO = makeRoom("room", cookie);

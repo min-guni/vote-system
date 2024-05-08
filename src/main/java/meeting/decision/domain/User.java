@@ -2,6 +2,7 @@ package meeting.decision.domain;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class User {
     private Long id;
 
     private String username;
+
     private String hashedPassword;
 
     private LocalDateTime createDate;

@@ -5,8 +5,8 @@ import meeting.decision.domain.RoomParticipant;
 import meeting.decision.domain.User;
 import meeting.decision.dto.user.UserOutDTO;
 import meeting.decision.dto.user.UserUpdateDTO;
-import meeting.decision.exception.LoginFailedException;
-import meeting.decision.exception.UsernameAlreadyExistsException;
+import meeting.decision.exception.exceptions.LoginFailedException;
+import meeting.decision.exception.exceptions.UsernameAlreadyExistsException;
 import meeting.decision.repository.JpaUserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,10 @@ public class UserService {
             throw new UsernameAlreadyExistsException(username);
         }
         User savedUser = repository.save(new User(username, hassedPassword));
-        return new UserOutDTO(savedUser.getId(), savedUser.getUsername());
+
+
+        //확인 필요
+        return new UserOutDTO(savedUser.getId(), savedUser.getUsername(), savedUser.getCreateDate(), savedUser.getLastUpdateDate());
     }
     //update
     public void update(Long userId, UserUpdateDTO updateParam){
@@ -44,7 +47,7 @@ public class UserService {
 
     public UserOutDTO findById(Long userId){
         User user = repository.findById(userId).orElseThrow();
-        return new UserOutDTO(user.getId(), user.getUsername());
+        return new UserOutDTO(user.getId(), user.getUsername(), user.getCreateDate(), user.getLastUpdateDate());
     }
 
     public Long checkUser(String username, String plainPassword){

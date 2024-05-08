@@ -6,12 +6,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.Cookie;
 import meeting.decision.dto.room.RoomOutDTO;
+import meeting.decision.dto.room.RoomUpdateDTO;
 import meeting.decision.dto.user.UserOutDTO;
+import meeting.decision.dto.user.UserUpdateDTO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -41,8 +44,9 @@ public class RoomTest {
     
     
     @Test
+    @DisplayName("방 만들기 테스트")
     void testCreateRoom() throws Exception{
-        Cookie cookie = signupAndLogin("user", "user");
+        Cookie cookie = signupAndLogin("userid", "userpassword");
         makeRoom("room", cookie);
     }
 
@@ -52,11 +56,11 @@ public class RoomTest {
     void testAddRoom() throws Exception {
         Map<Long, UserOutDTO> dtoList = new HashMap<>();
         for (int i = 0; i < 10; i++) {
-            UserOutDTO user = signup("user" + i, "password" + i);
+            UserOutDTO user = signup("userid0" + i, "password" + i);
             dtoList.put(user.getId(), user);
         }
-        UserOutDTO user1 = signup("user", "password");
-        Cookie cookie = login("user", "password");
+        UserOutDTO user1 = signup("userid", "password");
+        Cookie cookie = login("userid", "password");
 
         MvcResult result = makeRoom("room1", cookie);
         String content = result.getResponse().getContentAsString();
@@ -82,7 +86,7 @@ public class RoomTest {
         assertThat(roomResult.size()).isEqualTo(11);
         dtoList.put(user1.getId(), user1);
         for(int i = 0; i < 11; i ++){
-            assertThat(roomResult.get(i)).isEqualTo(dtoList.get(roomResult.get(i).getId()));
+            assertThat(roomResult.get(i).getId()).isEqualTo(dtoList.get(roomResult.get(i).getId()).getId());
         }
 
     }
@@ -102,8 +106,8 @@ public class RoomTest {
             UserOutDTO user = signup("deluser" + i, "password" + i);
             delDTOList.put(user.getId(), user);
         }
-        UserOutDTO user1 = signup("user", "password");
-        Cookie cookie = login("user", "password");
+        UserOutDTO user1 = signup("userid", "password");
+        Cookie cookie = login("userid", "password");
 
         MvcResult result = makeRoom("room1", cookie);
         String content = result.getResponse().getContentAsString();
@@ -148,7 +152,9 @@ public class RoomTest {
         assertThat(roomResult1.size()).isEqualTo(num + 1);
         addDTOList.put(user1.getId(), user1);
         for(int i = 0; i < addDTOList.size(); i ++){
-            assertThat(roomResult1.get(i)).isEqualTo(addDTOList.get(roomResult1.get(i).getId()));
+            System.out.println(roomResult1.get(i));
+            assertThat(roomResult1.get(i).getId()).isEqualTo(addDTOList.get(roomResult1.get(i).getId()).getId());
+            assertThat(roomResult1.get(i).getUsername()).isEqualTo(addDTOList.get(roomResult1.get(i).getId()).getUsername());
         }
 
     }
@@ -162,8 +168,8 @@ public class RoomTest {
             addDTOList.put(user.getId(), user);
         }
 
-        UserOutDTO user1 = signup("user", "password");
-        Cookie cookie = login("user", "password");
+        UserOutDTO user1 = signup("userid", "password");
+        Cookie cookie = login("userid", "password");
 
         MvcResult result = makeRoom("room1", cookie);
         String content = result.getResponse().getContentAsString();
@@ -175,27 +181,23 @@ public class RoomTest {
                     .andExpect(status().isOk());
         }
         em.clear();
-        long start = System.currentTimeMillis();
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/room/" + roomOutDTO.getRoomId())
                 .cookie(cookie))
                 .andExpect(status().isOk());
-        ;
-        long end = System.currentTimeMillis();
 
         mockMvc.perform(MockMvcRequestBuilders.get("/room/" + roomOutDTO.getRoomId())
                 .cookie(cookie))
                 .andExpect(status().isNotFound());
-        System.out.println("실행시간 : " + (end - start) + "ms");
     }
 
     @Test
     @DisplayName("방의 주인만이 초대 삭제할 수 있음")
     void AuthTest() throws Exception {
-        UserOutDTO user1 = signup("user1", "password");
-        Cookie cookie1 = login("user1", "password");
+        UserOutDTO user1 = signup("userid1", "password");
+        Cookie cookie1 = login("userid1", "password");
 
-        UserOutDTO user2 = signup("user2", "password");
+        UserOutDTO user2 = signup("userid2", "password");
 
         MvcResult result = makeRoom("room1", cookie1);
         String content = result.getResponse().getContentAsString();
@@ -204,16 +206,16 @@ public class RoomTest {
         em.clear();
 
         mockMvc.perform(MockMvcRequestBuilders.put("/room/" + roomOutDTO.getRoomId() + "/user/" + user2.getId()))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
 
         mockMvc.perform(MockMvcRequestBuilders.put("/room/" + roomOutDTO.getRoomId() + "/user/" + user2.getId())
                         .cookie(cookie1))
                 .andExpect(status().isOk());
 
-        UserOutDTO user3 = signup("user3", "password");
+        UserOutDTO user3 = signup("userid3", "password");
 
 
-        Cookie cookie2 = login("user2", "password");
+        Cookie cookie2 = login("userid2", "password");
 
 
         //방장 아닌 사람이 방에 추가하기
@@ -240,6 +242,47 @@ public class RoomTest {
         mockMvc.perform(MockMvcRequestBuilders.put("/room/" + roomOutDTO.getRoomId() + "/user/" + user1.getId() + 5000)
                         .cookie(cookie2))
                 .andExpect(status().isForbidden());
+
+
+    }
+
+    @Test
+    @DisplayName("방 수정 테스트")
+    void roomUpdateTest() throws Exception {
+        UserOutDTO user1 = signup("username", "password");
+        Cookie cookie = login("username", "password");
+        MvcResult result = makeRoom("room", cookie);
+        String content = result.getResponse().getContentAsString();
+        RoomOutDTO roomOutDTO = objectMapper.readValue(content, RoomOutDTO.class);
+        assertThat(roomOutDTO.getRoomName()).isEqualTo("room");
+        UserOutDTO newUser = signup("newUser1", "password");
+
+
+        RoomUpdateDTO update = new RoomUpdateDTO(newUser.getId(), "update");
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/room/" + roomOutDTO.getRoomId())
+                        .cookie(cookie).contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(update)))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/room/" + roomOutDTO.getRoomId() + "/user/" + newUser.getId())
+                .cookie(cookie)).andExpect(status().isOk());
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/room/" + roomOutDTO.getRoomId())
+                        .cookie(cookie).contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(update)))
+                .andExpect(status().isOk());
+
+        MvcResult result1 = mockMvc.perform(MockMvcRequestBuilders.get("/room/" + roomOutDTO.getRoomId())
+                .cookie(cookie)).andExpect(status().isOk()).andReturn();
+        String content1 = result1.getResponse().getContentAsString();
+        RoomOutDTO roomOutDTO1 = objectMapper.readValue(content1, RoomOutDTO.class);
+
+        assertThat(roomOutDTO1.getRoomName()).isEqualTo(update.getRoomName());
+        assertThat(roomOutDTO1.getOwnerId()).isEqualTo(update.getOwnerId());
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/room/" + roomOutDTO.getRoomId() + "/user/" + newUser.getId())
+                .cookie(cookie)).andExpect(status().isForbidden());
 
 
     }

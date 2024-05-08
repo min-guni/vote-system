@@ -1,4 +1,4 @@
-package meeting.decision.exception;
+package meeting.decision.exception.exceptions;
 
 public class UserNotFoundErrorException extends RuntimeException{
     public UserNotFoundErrorException() {

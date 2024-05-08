@@ -1,4 +1,4 @@
-package meeting.decision.exception;
+package meeting.decision.exception.exceptions;
 
 public class UsernameAlreadyExistsException extends RuntimeException {
     public UsernameAlreadyExistsException(String username) {

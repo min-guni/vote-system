@@ -2,6 +2,7 @@ package meeting.decision.dto.vote;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,8 +20,9 @@ public class VoteOutDTO {
     private Long noNum;
     private Long abstentionNum;
     private Optional<List<VoteResultDTO>> voteResult;
+    private LocalDateTime startTime;
 
-    public VoteOutDTO(Long id, Long roomId, String voteName, boolean activated, boolean anonymous, Long yesNum, Long noNum, Long abstentionNum) {
+    public VoteOutDTO(Long id, Long roomId, String voteName, boolean activated, boolean anonymous, Long yesNum, Long noNum, Long abstentionNum, LocalDateTime startTime) {
         this.id = id;
         this.roomId = roomId;
         this.voteName = voteName;
@@ -30,5 +32,6 @@ public class VoteOutDTO {
         this.noNum = noNum;
         this.abstentionNum = abstentionNum;
         voteResult = null;
+        this.startTime = startTime;
     }
 }

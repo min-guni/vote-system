@@ -9,16 +9,14 @@ import meeting.decision.domain.User;
 import meeting.decision.dto.room.RoomOutDTO;
 import meeting.decision.dto.room.RoomUpdateDTO;
 import meeting.decision.dto.user.UserOutDTO;
-import meeting.decision.exception.DuplicateUserExeption;
-import meeting.decision.exception.RoomNotFoundException;
-import meeting.decision.exception.UserNotFoundErrorException;
+import meeting.decision.exception.exceptions.RoomNotFoundException;
+import meeting.decision.exception.exceptions.UserNotFoundErrorException;
+import meeting.decision.exception.exceptions.UserNotInRoomException;
 import meeting.decision.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -39,7 +37,9 @@ public class RoomService {
         User owner = userRepository.findById(ownerId).orElseThrow();
         Room room = roomRepository.save(new Room(roomName, owner));
         addUserToRoom(ownerId, room.getId(), ownerId);
-        return new RoomOutDTO(room.getId(), room.getRoomName(), ownerId, 1L);
+
+        //확인 필요
+        return new RoomOutDTO(room.getId(), room.getRoomName(), ownerId, 1L, room.getCreateTime());
     }
 
     //update
@@ -48,7 +48,11 @@ public class RoomService {
     public void update(Long ownerId, Long roomId, RoomUpdateDTO updateParam){ //owner인지 확인하는거 aop로 적용 Parameter에 Long 두개 있는지 확인
         Room room = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
         room.setRoomName(updateParam.getRoomName());
-        room.setOwner(updateParam.getOwner());
+        if(!roomParticipantRepository.existsByRoomIdAndUserId(roomId, updateParam.getOwnerId())){
+            throw new UserNotInRoomException(updateParam.getOwnerId());
+        }
+        User newOwner = userRepository.findById(updateParam.getOwnerId()).orElseThrow(UserNotFoundErrorException::new);
+        room.setOwner(newOwner);
     }
 
     //remove
@@ -65,24 +69,18 @@ public class RoomService {
     @CheckUser(isOwner = true)
     public void deleteUserFromRoom(Long ownerId, Long roomId, Long userId){
         User user = userRepository.findById(userId).orElseThrow();
+        Room room = roomRepository.findById(roomId).orElseThrow();
         if(user.getId().equals(ownerId)){   //Owner가 삭제될 경우 Room이 삭제
             delete(ownerId, roomId); // 내부 호출 주의
-            return;
-        }
-
-        Optional<RoomParticipant> participant = roomParticipantRepository.findByRoomIdAndUserId(roomId, user.getId());
-        if(participant.isEmpty()){
-            return;
         }
 
         roomParticipantRepository.deleteByRoomIdAndUserId(roomId, userId);
+
 
 //        //Lazy기 때문에 Select Qeury가 나감.
 //        room.getUserList().remove(participant.get());
 //        user.getRoomList().remove(participant.get());
     }
-    //내일 이거 테이블 바꿔보기
-    //add User에서 select join이 너무 많이 일어나는 문제가 발생
 
     @CheckUser(isOwner = true)
     public void addUserToRoom(Long ownerId, Long roomId, Long userId){
@@ -97,29 +95,19 @@ public class RoomService {
         roomParticipantRepository.save(roomParticipant);
     }
 
-    public List<RoomParticipant> findAllUser(Long roomId){
-        return roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new).getUserList();
-    }
-
-    public List<Room> findAll(){
-        return roomRepository.findAll();
-    }
 
     @CheckUser
+    @Transactional(readOnly = true)
     public List<UserOutDTO> findAllUserByRoomId(Long userId, Long roomId){
-        return roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new).getUserList().stream().map((participant -> new UserOutDTO(participant.getUser().getId(), participant.getUser().getUsername()))).collect(Collectors.toList());
+        return roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new).getUserList().stream().map((participant -> new UserOutDTO(participant.getUser().getId(), participant.getUser().getUsername(), participant.getUser().getCreateDate(), participant.getUser().getLastUpdateDate()))).collect(Collectors.toList());
     }
 
     @CheckUser
+    @Transactional(readOnly = true)
     public RoomOutDTO findRoomById(Long userId, Long roomId){
         return roomParticipantRepository.findRoomOutDTOByRoomId(roomId).orElseThrow(RoomNotFoundException::new);
     }
 
-
-    public List<RoomOutDTO> findAllRoom(){
-        return roomParticipantRepository.findAllDTO();
-        //return roomRepository.findAll().stream().map(room -> new RoomOutDTO(room.getId(), room.getRoomName(), room.getOwner().getId() ,room.getUserList().size())).collect(Collectors.toList());
-    }
 
     public List<RoomOutDTO> findAllRoomByUserId(Long userId){
         return roomParticipantRepository.findByIdDTO(userId);

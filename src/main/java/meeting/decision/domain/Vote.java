@@ -35,12 +35,15 @@ public class Vote {
     private boolean isAnonymous;
     private boolean isActivated;
 
-    //pre 뭐시기도 사용해보기
     public Vote(String voteName, boolean isAnonymous , Room room) {
         this.voteName = voteName;
         this.room = room;
         this.isAnonymous = isAnonymous;
         this.isActivated = true;
+    }
+
+    @PrePersist
+    public void setTime(){
         this.startTime = LocalDateTime.now();
     }
 }

@@ -1,14 +1,14 @@
 package meeting.decision.dto.user;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Getter
-@EqualsAndHashCode
 @AllArgsConstructor
 public class UserOutDTO {
-    Long id;
-    String username;
+    private Long id;
+    private String username;
+    private LocalDateTime createDate;
+    private LocalDateTime lastUpdateDate;
 }

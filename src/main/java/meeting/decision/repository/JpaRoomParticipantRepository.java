@@ -28,15 +28,15 @@ public interface JpaRoomParticipantRepository extends JpaRepository<RoomParticip
     @Query("DELETE FROM RoomParticipant rp WHERE rp.room.id = :roomId")
     void deleteByRoomId(Long roomId);
 
-    @Query("SELECT new meeting.decision.dto.room.RoomOutDTO(rp.room.id, rp.room.roomName, rp.room.owner.id, COUNT(rp)) " +
+    @Query("SELECT new meeting.decision.dto.room.RoomOutDTO(rp.room.id, rp.room.roomName, rp.room.owner.id, COUNT(rp), rp.room.createTime) " +
             "FROM RoomParticipant rp JOIN rp.room GROUP BY rp.room.id")
     List<RoomOutDTO> findAllDTO();
 
-    @Query("SELECT new meeting.decision.dto.room.RoomOutDTO(rp.room.id, rp.room.roomName, rp.room.owner.id, COUNT(rp)) " +
+    @Query("SELECT new meeting.decision.dto.room.RoomOutDTO(rp.room.id, rp.room.roomName, rp.room.owner.id, COUNT(rp), rp.room.createTime) " +
             "FROM RoomParticipant rp JOIN rp.room WHERE rp.room.id = :roomId GROUP BY rp.room.id")
     Optional<RoomOutDTO> findRoomOutDTOByRoomId(Long roomId);
 
-    @Query("SELECT new meeting.decision.dto.room.RoomOutDTO(rp.room.id, rp.room.roomName, rp.room.owner.id, COUNT(rp))" +
+    @Query("SELECT new meeting.decision.dto.room.RoomOutDTO(rp.room.id, rp.room.roomName, rp.room.owner.id, COUNT(rp), rp.room.createTime)" +
             " FROM RoomParticipant rp JOIN rp.room GROUP BY rp.room.id " +
             "HAVING rp.room.id IN (SELECT rp.room.id FROM RoomParticipant rp WHERE rp.user.id = :userId)")
     List<RoomOutDTO> findByIdDTO(@Param("userId") Long userId);
