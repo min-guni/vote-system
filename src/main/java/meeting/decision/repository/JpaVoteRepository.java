@@ -8,10 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Set;
 
 public interface JpaVoteRepository extends JpaRepository<Vote, Long> {
-    List<Vote> findByRoomId(Long id);
 
     @Query("SELECT new meeting.decision.dto.vote.VoteOutDTO(" +
             "v.id, v.room.id, v.voteName, v.isActivated, v.isAnonymous, " +

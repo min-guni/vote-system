@@ -1,18 +1,13 @@
 package meeting.decision.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import meeting.decision.argumentresolver.Login;
 import meeting.decision.dto.user.UserInDTO;
 import meeting.decision.dto.user.UserOutDTO;
 import meeting.decision.dto.user.UserUpdateDTO;
-import meeting.decision.jwt.JwtTokenProvider;
 import meeting.decision.service.UserService;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;

@@ -1,23 +1,17 @@
 package meeting.decision.controller;
 
-import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import meeting.decision.argumentresolver.Login;
-import meeting.decision.domain.Vote;
-import meeting.decision.domain.VotePaper;
-import meeting.decision.domain.VoteResultType;
 import meeting.decision.dto.vote.VoteInDTO;
 import meeting.decision.dto.vote.VoteOutDTO;
 import meeting.decision.dto.vote.VoteUpdateDTO;
-import meeting.decision.service.RoomService;
 import meeting.decision.service.VoteService;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/vote")

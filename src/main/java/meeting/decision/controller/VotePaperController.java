@@ -6,7 +6,6 @@ import meeting.decision.argumentresolver.Login;
 import meeting.decision.domain.VoteResultType;
 import meeting.decision.dto.vote.VoteOutDTO;
 import meeting.decision.service.VoteService;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

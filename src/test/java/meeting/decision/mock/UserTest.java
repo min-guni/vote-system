@@ -1,8 +1,5 @@
 package meeting.decision.mock;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import meeting.decision.argumentresolver.Login;
-import meeting.decision.dto.user.UserOutDTO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +12,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import jakarta.servlet.http.Cookie;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
