@@ -1,21 +1,16 @@
 package meeting.decision.service;
 
 import lombok.RequiredArgsConstructor;
-import meeting.decision.domain.RoomParticipant;
 import meeting.decision.domain.User;
-import meeting.decision.dto.room.RoomOutDTO;
-import meeting.decision.dto.user.UserOutDTO;
 import meeting.decision.dto.user.UserOutDetailDTO;
 import meeting.decision.dto.user.UserUpdateDTO;
 import meeting.decision.exception.exceptions.LoginFailedException;
-import meeting.decision.exception.exceptions.UserNotFoundErrorException;
 import meeting.decision.exception.exceptions.UsernameAlreadyExistsException;
 import meeting.decision.repository.JpaUserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service

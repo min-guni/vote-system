@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import meeting.decision.argumentresolver.Login;
 import meeting.decision.dto.user.UserInDTO;
-import meeting.decision.dto.user.UserOutDTO;
 import meeting.decision.dto.user.UserOutDetailDTO;
 import meeting.decision.dto.user.UserUpdateDTO;
 import meeting.decision.service.UserService;
