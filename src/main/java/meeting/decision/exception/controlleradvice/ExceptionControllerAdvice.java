@@ -2,6 +2,7 @@ package meeting.decision.exception.controlleradvice;
 
 
 import com.sun.jdi.request.DuplicateRequestException;
+import lombok.extern.slf4j.Slf4j;
 import meeting.decision.exception.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +18,15 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 @RestControllerAdvice
+@Slf4j
 public class ExceptionControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({UsernameAlreadyExistsException.class,
             NoSuchElementException.class,
             DuplicateRequestException.class,
             VoteResultTypeEnumParseException.class,
-            DuplicateUserExeption.class})
+            DuplicateUserExeption.class,
+            OwnerDeleteException.class})
     public String BadRequestExHandle(Exception e) {
         return e.getMessage();
     }

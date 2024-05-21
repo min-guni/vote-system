@@ -31,27 +31,25 @@ public class CheckUserAop {
     public void isService(){}
 
 
-
-
     @Before("checkUserAnnotation() && isService() && @annotation(annotation) && args(userId,roomIdOrVoteId,..)")
     public void CheckUser(CheckUser annotation, Long userId, Long roomIdOrVoteId){
-
 
         if(annotation.isVote()){
             roomIdOrVoteId = voteRepository.findById(roomIdOrVoteId).orElseThrow(VoteNotFoundException::new).getRoom().getId();
         }
 
+        Long roomId = roomIdOrVoteId;
 
         if(annotation.isOwner()){
             //checkOwner
-            if(!roomRepository.findById(roomIdOrVoteId).orElseThrow().getOwner().getId().equals(userId)){
-                throw new AuthorizationServiceException("YOU ARE NOT "+roomIdOrVoteId + " OWNER");
+            if(!roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new).getOwner().getId().equals(userId)){
+                throw new AuthorizationServiceException("YOU ARE NOT "+roomId + " OWNER");
             }
         }
         else{
-            if(!participantRepository.existsByRoomIdAndUserId(roomIdOrVoteId,userId)){
-                roomRepository.findById(roomIdOrVoteId).orElseThrow(RoomNotFoundException::new);
-                throw new AuthorizationServiceException("YOU ARE NOT IN " +roomIdOrVoteId + " ROOM");
+            if(!participantRepository.existsByRoomIdAndUserId(roomId,userId)){
+                roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
+                throw new AuthorizationServiceException("YOU ARE NOT IN " +roomId + " ROOM");
             }
         }
     }

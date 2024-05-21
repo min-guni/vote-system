@@ -393,13 +393,19 @@ public class VoteTest {
             voteResultMap.put(voteId, voteResultArr);
         }
 
+        long start = System.currentTimeMillis();
+
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/vote/" + roomOutDTO.getRoomId())
                         .cookie(cookie))
                 .andExpect(status().isOk())
                 .andReturn();
 
+        long end = System.currentTimeMillis();
+
+        System.out.println("수행시간 : " + (end - start));
+
         String content = result.getResponse().getContentAsString();
-        List<VoteOutDTO> voteOutDTOList = objectMapper.readValue(content, new TypeReference<List<VoteOutDTO>>() {});
+        List<VoteOutDTO> voteOutDTOList = objectMapper.readValue(content, new TypeReference<List<VoteOutDTO>>(){});
 
         assertThat(voteOutDTOList.size()).isEqualTo(10);
 
@@ -466,23 +472,28 @@ public class VoteTest {
                     .andExpect(status().isOk());
         }
 
+        em.flush();
+        em.clear();
+
+        System.out.println("수행시간 측정 시작");
+        long start = System.currentTimeMillis();
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/votePaper/" + voteOutDTO.getId())
                         .cookie(cookie))
                 .andExpect(status().isOk())
                 .andReturn();
 
+        long end = System.currentTimeMillis();
+        System.out.println("수행시간 : " + (end - start));
         String content = result.getResponse().getContentAsString();
         VoteOutDTO voteResult = objectMapper.readValue(content, VoteOutDTO.class);
 
+        System.out.println(voteResult);
         assertThat(voteResult.getYesNum()).isEqualTo(saveVoteList[0]);
         assertThat(voteResult.getNoNum()).isEqualTo(saveVoteList[1]);
         assertThat(voteResult.getAbstentionNum()).isEqualTo(saveVoteList[2]);
 
         List<Long> voteResultIds = voteResult.getVoteResult().get().stream()
                 .map(VoteResultDTO::getUserId).toList();
-
-
-        System.out.println(voteResult);
 
         assertThat(addDTOList.keySet()).allMatch(voteResultIds::contains);
         assertThat(voteResultIds.size()).isEqualTo(10);
@@ -580,13 +591,16 @@ public class VoteTest {
                     .andExpect(status().isOk());
             saveVoteList[randomNum] ++;
         }
-
+        em.flush();
         em.clear();
         long start = System.currentTimeMillis();
 
+
+        System.out.println("delete 시작");
         mockMvc.perform(MockMvcRequestBuilders.delete("/votePaper/" + voteOutDTO.getId())
                         .cookie(cookie))
                 .andExpect(status().isOk());
+        System.out.println("delete 종료");
 
         long end = System.currentTimeMillis();
 
@@ -601,7 +615,7 @@ public class VoteTest {
         assertThat(voteOutDTO1.getNoNum()).isEqualTo(0);
         assertThat(voteOutDTO1.getYesNum()).isEqualTo(0);
         assertThat(voteOutDTO1.getAbstentionNum()).isEqualTo(0);
-        System.out.println(start - end);
+        System.out.println("delete 수행시간" + (end - start));
     }
 
     private RoomOutDTO makeRoom(String roomName, Cookie cookie) throws Exception {

@@ -26,7 +26,7 @@ public class Vote {
     private Room room;
 
 
-    @OneToMany(mappedBy = "vote", cascade = CascadeType.ALL ,orphanRemoval = true)
+    @OneToMany(mappedBy = "vote", cascade = CascadeType.REMOVE ,orphanRemoval = true)
     private List<VotePaper> papers = new ArrayList<>();
 
 

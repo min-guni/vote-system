@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import meeting.decision.argumentresolver.Login;
 import meeting.decision.dto.user.UserInDTO;
 import meeting.decision.dto.user.UserOutDTO;
+import meeting.decision.dto.user.UserOutDetailDTO;
 import meeting.decision.dto.user.UserUpdateDTO;
 import meeting.decision.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -24,13 +25,13 @@ public class UserController {
 
     @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserOutDTO signUp(@Validated UserInDTO userInDTO){
+    public UserOutDetailDTO signUp(@Validated UserInDTO userInDTO){
         //암호화
         return userService.create(userInDTO.getUsername(), passwordEncoder.encode(userInDTO.getPassword()));
     }
 
     @GetMapping("/me")
-    public UserOutDTO whoAmI(@Login Long userId){
+    public UserOutDetailDTO whoAmI(@Login Long userId){
         return userService.findById(userId);
     }
 

@@ -5,9 +5,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.Cookie;
+import meeting.decision.domain.Room;
 import meeting.decision.dto.room.RoomOutDTO;
 import meeting.decision.dto.room.RoomUpdateDTO;
 import meeting.decision.dto.user.UserOutDTO;
+import meeting.decision.template.LogTemplate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,13 +42,41 @@ public class RoomTest {
 
     @Autowired
     EntityManager em;
-    
+
+
+    private final LogTemplate logTemplate = new LogTemplate();
     
     @Test
     @DisplayName("방 만들기 테스트")
     void testCreateRoom() throws Exception{
         Cookie cookie = signupAndLogin("userid", "userpassword");
         makeRoom("room", cookie);
+    }
+
+    @Test
+    @DisplayName("사용자 방 리스트 테스트")
+    void testUserRoomListTest() throws Exception{
+        UserOutDTO user1 = signup("userid", "password");
+        Cookie cookie = login("userId", "password");
+
+        for(int i = 0; i < 10; i ++){
+            MvcResult result = makeRoom("room" + i, cookie);
+        }
+
+
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/room/")
+                .cookie(cookie)).andExpect(status().isOk()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        List<RoomOutDTO> roomOutDTOList = objectMapper.readValue(content, new TypeReference<List<RoomOutDTO>>(){});
+        assertThat(roomOutDTOList.size()).isEqualTo(10);
+
+        for(RoomOutDTO roomOutDTO : roomOutDTOList){
+            assertThat(roomOutDTO.getUserNum()).isEqualTo(1);
+            assertThat(roomOutDTO.getOwnerId()).isEqualTo(user1.getId());
+        }
+
     }
 
 
@@ -64,10 +94,6 @@ public class RoomTest {
         MvcResult result = makeRoom("room1", cookie);
         String content = result.getResponse().getContentAsString();
         RoomOutDTO roomOutDTO = objectMapper.readValue(content, RoomOutDTO.class);
-
-
-
-
 
         for(Long id : dtoList.keySet()){
             mockMvc.perform(MockMvcRequestBuilders.put("/room/" + roomOutDTO.getRoomId() + "/user/" + id)
@@ -93,7 +119,7 @@ public class RoomTest {
     @Test
     @DisplayName("채팅방 인원 삭제 테스트")
     void deleteTest() throws Exception {
-        int num = 10;
+        int num = 100;
 
         Map<Long, UserOutDTO> addDTOList = new HashMap<>();
         for (int i = 0; i < num; i++) {
@@ -146,12 +172,17 @@ public class RoomTest {
                 .andReturn();
 
         String content2 = result2.getResponse().getContentAsString();
-        System.out.println(content2);
         List<UserOutDTO> roomResult1 = objectMapper.readValue(content2, new TypeReference<List<UserOutDTO>>(){});
         assertThat(roomResult1.size()).isEqualTo(num + 1);
         addDTOList.put(user1.getId(), user1);
+
+
+        MvcResult mvcResult123 = mockMvc.perform(MockMvcRequestBuilders.get("/room/")
+                .cookie(cookie)).andExpect(status().isOk()).andReturn();
+
+
+
         for(int i = 0; i < addDTOList.size(); i ++){
-            System.out.println(roomResult1.get(i));
             assertThat(roomResult1.get(i).getId()).isEqualTo(addDTOList.get(roomResult1.get(i).getId()).getId());
             assertThat(roomResult1.get(i).getUsername()).isEqualTo(addDTOList.get(roomResult1.get(i).getId()).getUsername());
         }
@@ -160,7 +191,7 @@ public class RoomTest {
     @Test
     @DisplayName("ROOM 삭제 TEST")
     void roomDeleteTest() throws Exception {
-        int num = 10;
+        int num = 100;
         Map<Long, UserOutDTO> addDTOList = new HashMap<>();
         for (int i = 0; i < num; i++) {
             UserOutDTO user = signup("adduser" + i, "password" + i);
@@ -179,11 +210,10 @@ public class RoomTest {
                             .cookie(cookie))
                     .andExpect(status().isOk());
         }
-        em.clear();
-
-        mockMvc.perform(MockMvcRequestBuilders.delete("/room/" + roomOutDTO.getRoomId())
-                .cookie(cookie))
-                .andExpect(status().isOk());
+        logTemplate.execute(em, ()->{
+            mockMvc.perform(MockMvcRequestBuilders.delete("/room/" + roomOutDTO.getRoomId())
+                        .cookie(cookie))
+                .andExpect(status().isOk());});
 
         mockMvc.perform(MockMvcRequestBuilders.get("/room/" + roomOutDTO.getRoomId())
                 .cookie(cookie))
@@ -232,6 +262,11 @@ public class RoomTest {
                         .cookie(cookie2))
                 .andExpect(status().isForbidden());
 
+        //방장이 방장 추방
+        mockMvc.perform(MockMvcRequestBuilders.delete("/room/" + roomOutDTO.getRoomId() + "/user/" + user1.getId())
+                        .cookie(cookie1))
+                .andExpect(status().isBadRequest());
+
         //방장 아닌 사람이 원래 있는 사람 다시 초대
         mockMvc.perform(MockMvcRequestBuilders.put("/room/" + roomOutDTO.getRoomId() + "/user/" + user1.getId())
                         .cookie(cookie2))
@@ -272,10 +307,15 @@ public class RoomTest {
                         .content(objectMapper.writeValueAsString(update)))
                 .andExpect(status().isOk());
 
+        em.flush();
+        em.clear();
+
         MvcResult result1 = mockMvc.perform(MockMvcRequestBuilders.get("/room/" + roomOutDTO.getRoomId())
                 .cookie(cookie)).andExpect(status().isOk()).andReturn();
         String content1 = result1.getResponse().getContentAsString();
         RoomOutDTO roomOutDTO1 = objectMapper.readValue(content1, RoomOutDTO.class);
+
+        System.out.println(roomOutDTO1);
 
         assertThat(roomOutDTO1.getRoomName()).isEqualTo(update.getRoomName());
         assertThat(roomOutDTO1.getOwnerId()).isEqualTo(update.getOwnerId());

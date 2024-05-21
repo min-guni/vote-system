@@ -1,5 +1,6 @@
 package meeting.decision.mock;
 
+import meeting.decision.template.LogTemplate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,6 @@ public class UserTest {
 
     @Autowired
     private MockMvc mockMvc;
-
 
     @Test
     @DisplayName("중복 닉네임 확인 테스트")

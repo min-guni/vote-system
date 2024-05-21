@@ -9,6 +9,7 @@ import meeting.decision.domain.User;
 import meeting.decision.dto.room.RoomOutDTO;
 import meeting.decision.dto.room.RoomUpdateDTO;
 import meeting.decision.dto.user.UserOutDTO;
+import meeting.decision.exception.exceptions.OwnerDeleteException;
 import meeting.decision.exception.exceptions.RoomNotFoundException;
 import meeting.decision.exception.exceptions.UserNotFoundErrorException;
 import meeting.decision.exception.exceptions.UserNotInRoomException;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -45,7 +47,7 @@ public class RoomService {
     //update
 
     @CheckUser(isOwner = true)
-    public void update(Long ownerId, Long roomId, RoomUpdateDTO updateParam){ //owner인지 확인하는거 aop로 적용 Parameter에 Long 두개 있는지 확인
+    public void update(Long ownerId, Long roomId, RoomUpdateDTO updateParam){
         Room room = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
         room.setRoomName(updateParam.getRoomName());
         if(!roomParticipantRepository.existsByRoomIdAndUserId(roomId, updateParam.getOwnerId())){
@@ -69,13 +71,11 @@ public class RoomService {
     @CheckUser(isOwner = true)
     public void deleteUserFromRoom(Long ownerId, Long roomId, Long userId){
         User user = userRepository.findById(userId).orElseThrow();
-        Room room = roomRepository.findById(roomId).orElseThrow();
-        if(user.getId().equals(ownerId)){   //Owner가 삭제될 경우 Room이 삭제
-            delete(ownerId, roomId); // 내부 호출 주의
+        if(user.getId().equals(ownerId)){   //Owner가 삭제될 경우 오류발생
+            throw new OwnerDeleteException();
         }
 
         roomParticipantRepository.deleteByRoomIdAndUserId(roomId, userId);
-
 
 //        //Lazy기 때문에 Select Qeury가 나감.
 //        room.getUserList().remove(participant.get());
@@ -86,7 +86,7 @@ public class RoomService {
     public void addUserToRoom(Long ownerId, Long roomId, Long userId){
 
         Room room = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundErrorException::new);
 
         if(roomParticipantRepository.existsByRoomIdAndUserId(roomId, userId)){
             return;
@@ -99,17 +99,36 @@ public class RoomService {
     @CheckUser
     @Transactional(readOnly = true)
     public List<UserOutDTO> findAllUserByRoomId(Long userId, Long roomId){
-        return roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new).getUserList().stream().map((participant -> new UserOutDTO(participant.getUser().getId(), participant.getUser().getUsername(), participant.getUser().getCreateDate(), participant.getUser().getLastUpdateDate()))).collect(Collectors.toList());
+        return roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new)
+                .getUserList().stream()
+                .map((participant -> new UserOutDTO(
+                        participant.getUser().getId(),
+                        participant.getUser().getUsername()))).
+                collect(Collectors.toList());
     }
 
     @CheckUser
     @Transactional(readOnly = true)
     public RoomOutDTO findRoomById(Long userId, Long roomId){
-        return roomParticipantRepository.findRoomOutDTOByRoomId(roomId).orElseThrow(RoomNotFoundException::new);
+        Room room = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
+        return new RoomOutDTO(roomId, room.getRoomName(), room.getOwner().getId(), (long) room.getUserList().size(), room.getCreateTime());
+
+        //return roomParticipantRepository.findRoomOutDTOByRoomId(roomId).orElseThrow(RoomNotFoundException::new);
     }
 
 
     public List<RoomOutDTO> findAllRoomByUserId(Long userId){
-        return roomParticipantRepository.findByIdDTO(userId);
+        List<Room> roomList = roomRepository.findRoomByUserId(userId);
+        return roomList.stream()
+                .map(room -> new RoomOutDTO(
+                        room.getId(),
+                        room.getRoomName(),
+                        room.getOwner().getId(),
+                        (long) room.getUserList().size(),
+                        room.getCreateTime()
+                ))
+                .collect(Collectors.toList());
+
+        //return roomParticipantRepository.findByIdDTO(userId);
     }
 }

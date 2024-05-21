@@ -9,6 +9,4 @@ import java.time.LocalDateTime;
 public class UserOutDTO {
     private Long id;
     private String username;
-    private LocalDateTime createDate;
-    private LocalDateTime lastUpdateDate;
 }

@@ -31,7 +31,11 @@ public class VoteOutDTO {
         this.yesNum = yesNum;
         this.noNum = noNum;
         this.abstentionNum = abstentionNum;
-        voteResult = null;
+        voteResult = Optional.empty();
         this.startTime = startTime;
+    }
+
+    public void setVoteResult(Optional<List<VoteResultDTO>> voteResult) {
+        this.voteResult = voteResult;
     }
 }

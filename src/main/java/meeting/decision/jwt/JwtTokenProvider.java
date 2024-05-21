@@ -16,7 +16,7 @@ public class JwtTokenProvider {
 
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
-    private final long validityInMilliseconds = 360000;
+    private final long validityInMilliseconds = 3600000;
 
 
     // Create token

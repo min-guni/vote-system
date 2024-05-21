@@ -3,9 +3,12 @@ package meeting.decision.service;
 import lombok.RequiredArgsConstructor;
 import meeting.decision.domain.RoomParticipant;
 import meeting.decision.domain.User;
+import meeting.decision.dto.room.RoomOutDTO;
 import meeting.decision.dto.user.UserOutDTO;
+import meeting.decision.dto.user.UserOutDetailDTO;
 import meeting.decision.dto.user.UserUpdateDTO;
 import meeting.decision.exception.exceptions.LoginFailedException;
+import meeting.decision.exception.exceptions.UserNotFoundErrorException;
 import meeting.decision.exception.exceptions.UsernameAlreadyExistsException;
 import meeting.decision.repository.JpaUserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,7 +26,7 @@ public class UserService {
     private final JpaUserRepository repository;
     private final PasswordEncoder passwordEncoder;
     //create
-    public UserOutDTO create(String username, String hassedPassword){
+    public UserOutDetailDTO create(String username, String hassedPassword){
         //이미 같은 username이 있는 지 확인
         Optional<User> byUsername = repository.findByUsername(username);
         if(byUsername.isPresent()){
@@ -31,9 +34,7 @@ public class UserService {
         }
         User savedUser = repository.save(new User(username, hassedPassword));
 
-
-        //확인 필요
-        return new UserOutDTO(savedUser.getId(), savedUser.getUsername(), savedUser.getCreateDate(), savedUser.getLastUpdateDate());
+        return new UserOutDetailDTO(savedUser.getId(), savedUser.getUsername(), savedUser.getCreateDate(), savedUser.getLastUpdateDate());
     }
     //update
     public void update(Long userId, UserUpdateDTO updateParam){
@@ -45,9 +46,9 @@ public class UserService {
         updateUser.setHashedPassword(updateParam.getPassword());
     }
 
-    public UserOutDTO findById(Long userId){
+    public UserOutDetailDTO findById(Long userId){
         User user = repository.findById(userId).orElseThrow();
-        return new UserOutDTO(user.getId(), user.getUsername(), user.getCreateDate(), user.getLastUpdateDate());
+        return new UserOutDetailDTO(user.getId(), user.getUsername(), user.getCreateDate(), user.getLastUpdateDate());
     }
 
     public Long checkUser(String username, String plainPassword){
@@ -59,10 +60,5 @@ public class UserService {
             throw new LoginFailedException();
         }
     }
-
-    public List<RoomParticipant> findAllRoomsById(Long userId){
-        return repository.findById(userId).orElseThrow().getRoomList(); // N + 1 문제 나올 가능성 100퍼 ㅋㅋ
-    }
-
 
 }

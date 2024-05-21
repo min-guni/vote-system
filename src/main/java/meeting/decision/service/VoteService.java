@@ -6,10 +6,9 @@ import meeting.decision.annotation.CheckUser;
 import meeting.decision.domain.*;
 import meeting.decision.dto.vote.VoteInDTO;
 import meeting.decision.dto.vote.VoteOutDTO;
+import meeting.decision.dto.vote.VoteResultDTO;
 import meeting.decision.dto.vote.VoteUpdateDTO;
-import meeting.decision.exception.exceptions.UserNotInRoomException;
-import meeting.decision.exception.exceptions.VoteIsNotActivatedException;
-import meeting.decision.exception.exceptions.VoteNotFoundException;
+import meeting.decision.exception.exceptions.*;
 import meeting.decision.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,8 +29,8 @@ public class VoteService {
     private final JpaVotePaperRepository votePaperRepository;
 
     @CheckUser(isOwner = true)
-    public VoteOutDTO create(Long ownerId, Long roomId, VoteInDTO voteInDTO){  // vote dto로 변경하기
-        Room room = roomRepository.findById(roomId).orElseThrow();
+    public VoteOutDTO create(Long ownerId, Long roomId, VoteInDTO voteInDTO){
+        Room room = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
         Vote savedVote = voteRepository.save(new Vote(voteInDTO.getVoteName(), voteInDTO.isAnonymous(), room));
 
         return new VoteOutDTO(savedVote.getId(),
@@ -51,68 +50,28 @@ public class VoteService {
 
     @CheckUser(isOwner = true, isVote = true)
     public void delete(Long ownerId, Long voteId){
-        votePaperRepository.deleteVotePaperByVoteId(voteId);
         voteRepository.deleteById(voteId);
     }
 
     //reset VotePaper
     @CheckUser(isOwner = true, isVote = true)
     public void resetVote(Long ownerId, Long voteId){
-        Vote vote = voteRepository.findById(voteId).orElseThrow(VoteNotFoundException::new);
-        votePaperRepository.deleteVotePaperByVoteId(voteId);
-        vote.getPapers().clear(); // delete 쿼리 N번 발생
+        Vote vote = voteRepository.findById(voteId).orElseThrow();
+        vote.getPapers().clear();
+        //votePaperRepository.deleteVotePaperByVoteId(voteId);
     }
 
-    //투표 결과 보여주기 inactivate일때만 보여주기 vote타입에 따라 다름
 
-
-
-    //이것도 COUNT하는 걸로 바꿉시다 근데 성능테스트 해보자
     @CheckUser(isVote = true)
     public VoteOutDTO getResult(Long userId, Long voteId) {
-        Vote vote = voteRepository.findById(voteId).orElseThrow(VoteNotFoundException::new);
-        List<Object[]> results = votePaperRepository.countVoteResultByType(voteId);
-        Long[] counts = new Long[3]; // 0: yes, 1: no, 2: abstain
-        Arrays.fill(counts, 0L);
-
-        for (Object[] result : results) {
-            VoteResultType type = (VoteResultType) result[0];
-            long count = (Long) result[1];
-
-            switch (type.getDesc()) {
-                case "YES":
-                    counts[0] = count;
-                    break;
-                case "NO":
-                    counts[1] = count;
-                    break;
-                case "ABSTAIN":
-                    counts[2] = count;
-                    break;
-            }
-        }
-        if(vote.isAnonymous()){
-            return new VoteOutDTO(voteId, vote.getRoom().getId(),
-                    vote.getVoteName(),
-                    vote.isActivated(),
-                    true,
-                    counts[0], counts[1], counts[2],vote.getStartTime());
-        }
-        else{
-            return new VoteOutDTO(voteId, vote.getRoom().getId(),
-                    vote.getVoteName(),
-                    vote.isActivated(),
-                    false,
-                    counts[0], counts[1], counts[2],
-                    Optional.ofNullable(votePaperRepository.getVoteResultDTOByVoteID(voteId)), vote.getStartTime());
-        }
+        Vote vote = voteRepository.findVoteByVoteIdWithFetch(voteId).orElseThrow(VoteNotFoundException::new);
+        return calResult(vote, vote.getPapers(), vote.isAnonymous());
     }
 
-    //void 로 바꾸고 Exception 발생
     @CheckUser(isVote = true)
     public void addVotePaper(Long userId, Long voteId, VoteResultType voteResultType){
         //이미 투표에 투표있는지 확인 있는지 확인 있으면 false 반환
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundErrorException::new);
         Vote vote = voteRepository.findById(voteId).orElseThrow(VoteNotFoundException::new);
 
 
@@ -132,11 +91,58 @@ public class VoteService {
         votePaperRepository.save(votePaper);
     }
 
-    //투표들 다 보여주기 vote dto를 내보내는데 찬성수 반대수만
     @CheckUser
     @Transactional(readOnly = true)
     public List<VoteOutDTO> getVotes(Long userId, Long roomId){
+        List<Vote> voteList = voteRepository.findVoteByRoomId(roomId);  //수행시간 104ms
+        List<VoteOutDTO> voteOutDTOList = new ArrayList<>();
+        for(Vote vote : voteList){
+            voteOutDTOList.add(calResult(vote, vote.getPapers(), true));
+        }
+        return voteOutDTOList;
+//        return voteRepository.findVoteOutDTOByRoomId(roomId); // 수행시간 38ms
+    }
 
-        return voteRepository.findVoteOutDTOByRoomId(roomId);
+
+    private VoteOutDTO calResult(Vote vote, List<VotePaper> votePapers, boolean isAnonymous){
+        Long yesNum = 0L, noNum = 0L, abstentionNum = 0L;
+        List<VoteResultDTO> voteResultDTOList = new ArrayList<>();
+        for(VotePaper vp : votePapers){
+            switch (vp.getVoteResultType()){
+                case YES -> {
+                    yesNum++;
+                }
+                case NO -> {
+                    noNum++;
+                }
+                case ABSTAIN -> {
+                    abstentionNum++;
+                }
+            }
+            if(!isAnonymous){
+                voteResultDTOList.add(new VoteResultDTO(
+                        vp.getUser().getId(),
+                        vp.getUser().getUsername(),
+                        vp.getVoteResultType()
+                ));
+            }
+        }
+        VoteOutDTO voteOutDTO = new VoteOutDTO(
+                vote.getId(),
+                vote.getRoom().getId(),
+                vote.getVoteName(),
+                vote.isActivated(),
+                isAnonymous,
+                yesNum,
+                noNum,
+                abstentionNum,
+                vote.getStartTime()
+        );
+
+        if (!isAnonymous) {
+            voteOutDTO.setVoteResult(Optional.of(voteResultDTOList));
+        }
+
+        return voteOutDTO;
     }
 }
