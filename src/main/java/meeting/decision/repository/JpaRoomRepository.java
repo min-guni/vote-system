@@ -8,7 +8,5 @@ import java.util.List;
 
 
 public interface JpaRoomRepository extends JpaRepository<Room, Long> {
-    @Query("SELECT r FROM Room r JOIN FETCH r.userList rp WHERE rp.user.id = :userId")
-    List<Room> findRoomByUserId(Long userId);
 
 }

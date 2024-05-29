@@ -13,6 +13,5 @@ public class LogTemplate {
         em.clear();
         long end = System.currentTimeMillis();
         System.out.println("수행 종료 [수행시간 : " + (end - start) + "ms]");
-
     }
 }

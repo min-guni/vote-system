@@ -21,7 +21,6 @@ import java.net.InetAddress;
 public class IpFilter implements Filter {
     private final DatabaseReader dbReader;
 
-
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;

@@ -117,17 +117,7 @@ public class RoomService {
 
 
     public List<RoomOutDTO> findAllRoomByUserId(Long userId){
-        List<Room> roomList = roomRepository.findRoomByUserId(userId);
-        return roomList.stream()
-                .map(room -> new RoomOutDTO(
-                        room.getId(),
-                        room.getRoomName(),
-                        room.getOwner().getId(),
-                        (long) room.getUserList().size(),
-                        room.getCreateTime()
-                ))
-                .collect(Collectors.toList());
 
-        //return roomParticipantRepository.findByIdDTO(userId);
+        return roomParticipantRepository.findRoomOutDTOByUserId(userId);
     }
 }

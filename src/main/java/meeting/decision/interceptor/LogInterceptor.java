@@ -30,16 +30,22 @@ public class LogInterceptor implements HandlerInterceptor {
         long endTime = System.currentTimeMillis();
         long executionTime = endTime - startTime;
 
-        HandlerMethod handlerMethod = (HandlerMethod) handler;
-        String methodName = handlerMethod.getMethod().getName();
-        String className = handlerMethod.getBeanType().getSimpleName();
+        if (handler instanceof HandlerMethod) {
+            HandlerMethod handlerMethod = (HandlerMethod) handler;
+            String methodName = handlerMethod.getMethod().getName();
+            String className = handlerMethod.getBeanType().getSimpleName();
 
-        String uuid = (String) request.getAttribute("uuid");
-
-        if (executionTime > WARNING_THRESHOLD) {
-            log.warn("[{}] [{}.{}] executed in {} ms", uuid , className , methodName , executionTime);
+            String uuid = (String) request.getAttribute("uuid");
+            if(ex != null){
+                log.error("[{}] [{}.{}] error executed in {} ms", uuid , className , methodName , executionTime);
+            }
+            else if (executionTime > WARNING_THRESHOLD) {
+                log.warn("[{}] [{}.{}] executed in {} ms", uuid , className , methodName , executionTime);
+            } else {
+                log.info("[{}] [{}.{}] executed in {} ms", uuid , className , methodName , executionTime);
+            }
         } else {
-            log.info("[{}] [{}.{}] executed in {} ms", uuid , className , methodName , executionTime);
+            log.info("Request [{}] completed in {} ms", handler, executionTime);
         }
     }
 }

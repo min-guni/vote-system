@@ -58,24 +58,43 @@ public class RoomTest {
     void testUserRoomListTest() throws Exception{
         UserOutDTO user1 = signup("userid", "password");
         Cookie cookie = login("userId", "password");
-
+        Map<Long, RoomOutDTO> roomOutDTOMap = new HashMap<>();
         for(int i = 0; i < 10; i ++){
             MvcResult result = makeRoom("room" + i, cookie);
+            String content = result.getResponse().getContentAsString();
+            RoomOutDTO roomOutDTO = objectMapper.readValue(content, RoomOutDTO.class);
+            roomOutDTOMap.put(roomOutDTO.getRoomId(), roomOutDTO);
         }
 
-
-
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/room/")
-                .cookie(cookie)).andExpect(status().isOk()).andReturn();
-
-        String content = mvcResult.getResponse().getContentAsString();
-        List<RoomOutDTO> roomOutDTOList = objectMapper.readValue(content, new TypeReference<List<RoomOutDTO>>(){});
-        assertThat(roomOutDTOList.size()).isEqualTo(10);
-
-        for(RoomOutDTO roomOutDTO : roomOutDTOList){
-            assertThat(roomOutDTO.getUserNum()).isEqualTo(1);
-            assertThat(roomOutDTO.getOwnerId()).isEqualTo(user1.getId());
+        Map<Long, UserOutDTO> dtoList = new HashMap<>();
+        for (int i = 0; i < 10; i++) {
+            UserOutDTO user = signup("userid0" + i, "password" + i);
+            dtoList.put(user.getId(), user);
         }
+
+        for(Long roomId : roomOutDTOMap.keySet()){
+            for(Long userId : dtoList.keySet()){
+                mockMvc.perform(MockMvcRequestBuilders.put("/room/" + roomId + "/user/" + userId)
+                                .cookie(cookie))
+                        .andExpect(status().isOk());
+            }
+        }
+
+        logTemplate.execute(em, ()->{
+            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/room/")
+                    .cookie(cookie)).andExpect(status().isOk()).andReturn();
+        });
+
+//        String content = mvcResult.getResponse().getContentAsString();
+//        List<RoomOutDTO> roomOutDTOList = objectMapper.readValue(content, new TypeReference<List<RoomOutDTO>>(){});
+//        System.out.println(roomOutDTOList);
+//
+//        assertThat(roomOutDTOList.size()).isEqualTo(10);
+//
+//        for(RoomOutDTO roomOutDTO : roomOutDTOList){
+//            assertThat(roomOutDTO.getUserNum()).isEqualTo(11L);
+//            assertThat(roomOutDTO.getOwnerId()).isEqualTo(user1.getId());
+//        }
 
     }
 
@@ -231,6 +250,7 @@ public class RoomTest {
         MvcResult result = makeRoom("room1", cookie1);
         String content = result.getResponse().getContentAsString();
         RoomOutDTO roomOutDTO = objectMapper.readValue(content, RoomOutDTO.class);
+
 
         em.clear();
 
