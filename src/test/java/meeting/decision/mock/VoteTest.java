@@ -144,7 +144,7 @@ public class VoteTest {
         for(int i = 0; i < num; i++){
             int randomNum = random.nextInt(3);
             Cookie myCookie = login("adduser" + i, "password" + i);
-            mockMvc.perform(MockMvcRequestBuilders.put("/votePaper/" + voteOutDTO.getId())
+            mockMvc.perform(MockMvcRequestBuilders.post("/votePaper/" + voteOutDTO.getId())
                             .cookie(myCookie)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(("\"" + voteVal[randomNum] + "\"")))
@@ -206,7 +206,7 @@ public class VoteTest {
         for(int i = 0; i < num; i++){
             int randomNum = random.nextInt(3);
             Cookie myCookie = login("adduser" + i, "password" + i);
-            mockMvc.perform(MockMvcRequestBuilders.put("/votePaper/" + voteOutDTO.getId())
+            mockMvc.perform(MockMvcRequestBuilders.post("/votePaper/" + voteOutDTO.getId())
                             .cookie(myCookie)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(("\"" + voteVal[randomNum] + "\"")))
@@ -283,7 +283,7 @@ public class VoteTest {
         for(int i = 0; i < num; i++){
             int randomNum = random.nextInt(3);
             Cookie myCookie = login("adduser" + i, "password" + i);
-            mockMvc.perform(MockMvcRequestBuilders.put("/votePaper/" + voteOutDTO.getId())
+            mockMvc.perform(MockMvcRequestBuilders.post("/votePaper/" + voteOutDTO.getId())
                             .cookie(myCookie)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(("\"" + voteVal[randomNum] + "\"")))
@@ -335,7 +335,7 @@ public class VoteTest {
         }
         Cookie cookie1 = signupAndLogin("notRoomUser", "password");
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/votePaper/" + voteOutDTO.getId())
+        mockMvc.perform(MockMvcRequestBuilders.post("/votePaper/" + voteOutDTO.getId())
                         .cookie(cookie1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(("\"YES\"")))
@@ -383,7 +383,7 @@ public class VoteTest {
             for (int i = 0; i < num; i++) {
                 int randomNum = random.nextInt(3);
                 Cookie myCookie = login("adduser" + i, "password" + i);
-                mockMvc.perform(MockMvcRequestBuilders.put("/votePaper/" + voteId)
+                mockMvc.perform(MockMvcRequestBuilders.post("/votePaper/" + voteId)
                                 .cookie(myCookie)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(("\"" + voteVal[randomNum] + "\"")))
@@ -454,7 +454,7 @@ public class VoteTest {
         for(int i = 0; i < num; i++){
             int randomNum = random.nextInt(3);
             Cookie myCookie = login("adduser" + i, "password" + i);
-            mockMvc.perform(MockMvcRequestBuilders.put("/votePaper/" + voteOutDTO.getId())
+            mockMvc.perform(MockMvcRequestBuilders.post("/votePaper/" + voteOutDTO.getId())
                             .cookie(myCookie)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(("\"" + voteVal[randomNum] + "\"")))
@@ -465,11 +465,11 @@ public class VoteTest {
         for(int i = 0; i < num; i++){
             int randomNum = random.nextInt(3);
             Cookie myCookie = login("adduser" + i, "password" + i);
-            mockMvc.perform(MockMvcRequestBuilders.put("/votePaper/" + voteOutDTO.getId())
+            mockMvc.perform(MockMvcRequestBuilders.post("/votePaper/" + voteOutDTO.getId())
                             .cookie(myCookie)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(("\"" + voteVal[randomNum] + "\"")))
-                    .andExpect(status().isOk());
+                    .andExpect(status().isConflict());
         }
 
         em.flush();
@@ -533,7 +533,7 @@ public class VoteTest {
         for(int i = 0; i < num; i++){
             int randomNum = random.nextInt(3);
             Cookie myCookie = login("adduser" + i, "password" + i);
-            mockMvc.perform(MockMvcRequestBuilders.put("/votePaper/" + voteOutDTO.getId())
+            mockMvc.perform(MockMvcRequestBuilders.post("/votePaper/" + voteOutDTO.getId())
                             .cookie(myCookie)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(("\"" + voteVal[randomNum] + "\"")))
@@ -584,7 +584,7 @@ public class VoteTest {
         for(int i = 0; i < num; i++){
             int randomNum = random.nextInt(3);
             Cookie myCookie = login("adduser" + i, "password" + i);
-            mockMvc.perform(MockMvcRequestBuilders.put("/votePaper/" + voteOutDTO.getId())
+            mockMvc.perform(MockMvcRequestBuilders.post("/votePaper/" + voteOutDTO.getId())
                             .cookie(myCookie)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(("\"" + voteVal[randomNum] + "\"")))

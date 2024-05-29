@@ -55,7 +55,7 @@ public class RoomController {
         roomService.deleteUserFromRoom(userId, roomId, deleteId);
     }
 
-    @PutMapping("/{roomId}")
+    @PatchMapping("/{roomId}")
     public String update(@Login Long userId, @PathVariable Long roomId, @Validated @RequestBody RoomUpdateDTO roomUpdateDTO) {
         roomService.update(userId, roomId, roomUpdateDTO);
         return "success";

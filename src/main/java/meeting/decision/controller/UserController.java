@@ -29,13 +29,13 @@ public class UserController {
         return userService.create(userInDTO.getUsername(), passwordEncoder.encode(userInDTO.getPassword()));
     }
 
-    @GetMapping("/me")
+    @GetMapping("/")
     public UserOutDetailDTO whoAmI(@Login Long userId){
         return userService.findById(userId);
     }
 
 
-    @PutMapping("/")
+    @PatchMapping("/")
     public String updateUser(@Login Long userId, @RequestBody UserUpdateDTO updateParam){
         log.info(updateParam.getUsername());
         log.info(updateParam.getPassword());

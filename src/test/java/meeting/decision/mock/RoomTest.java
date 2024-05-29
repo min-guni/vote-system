@@ -314,7 +314,7 @@ public class RoomTest {
 
         RoomUpdateDTO update = new RoomUpdateDTO(newUser.getId(), "update");
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/room/" + roomOutDTO.getRoomId())
+        mockMvc.perform(MockMvcRequestBuilders.patch("/room/" + roomOutDTO.getRoomId())
                         .cookie(cookie).contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(update)))
                 .andExpect(status().isBadRequest());
@@ -322,7 +322,7 @@ public class RoomTest {
         mockMvc.perform(MockMvcRequestBuilders.put("/room/" + roomOutDTO.getRoomId() + "/user/" + newUser.getId())
                 .cookie(cookie)).andExpect(status().isOk());
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/room/" + roomOutDTO.getRoomId())
+        mockMvc.perform(MockMvcRequestBuilders.patch("/room/" + roomOutDTO.getRoomId())
                         .cookie(cookie).contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(update)))
                 .andExpect(status().isOk());

@@ -84,7 +84,7 @@ public class VoteService {
         }
 
         if(votePaperRepository.existsByVoteIdAndUserId(voteId, userId)){
-            return;
+            throw new AlreadyVotedException(userId + "already voted to " + voteId + " vote");
         }
 
         VotePaper votePaper = new VotePaper(user ,vote, voteResultType);

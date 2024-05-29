@@ -35,7 +35,7 @@ public class UserTest {
         MvcResult result2 = mockMvc.perform(MockMvcRequestBuilders.post("/user/")
                         .param("username" , "minguni123")
                         .param("password", "123dsadasd4"))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andReturn();
     }
 
@@ -167,39 +167,39 @@ public class UserTest {
         Cookie cookie = signupAndLogin("username", "1234567");
 
         //no cookie
-        mockMvc.perform(MockMvcRequestBuilders.put("/user/")
+        mockMvc.perform(MockMvcRequestBuilders.patch("/user/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"username\": \"newusername\", \"password\" :  \"123123123\"}"))
                 .andExpect(status().isUnauthorized());
 
 
         //already username
-        mockMvc.perform(MockMvcRequestBuilders.put("/user/")
+        mockMvc.perform(MockMvcRequestBuilders.patch("/user/")
                         .cookie(cookie)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"username\": \"dupulicatename\", \"password\" :  \"123123123\"}"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isConflict());
 
 
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/user/")
+        mockMvc.perform(MockMvcRequestBuilders.patch("/user/")
                         .cookie(cookie)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"username\": \"newusername\", \"password\" :  \"123123123\"}"))
                 .andExpect(status().isOk());
 
-        //같은 아이디로 하면 bad request
+        //같은 아이디로 하면 Conflict
         mockMvc.perform(MockMvcRequestBuilders.post("/user/")
                         .param("username", "newusername")
                         .param("password", "123123123"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isConflict());
     }
 
     @Test
     @DisplayName("자기 자신 정보 확인 테스트")
     void testUserMe() throws Exception {
         Cookie cookie = signupAndLogin("user1234567", "pass1234567");
-        mockMvc.perform(MockMvcRequestBuilders.get("/user/me")
+        mockMvc.perform(MockMvcRequestBuilders.get("/user/")
                         .cookie(cookie))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value("user1234567"));

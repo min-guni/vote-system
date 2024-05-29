@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class VotePaperController {
     private final VoteService voteService;
 
-    @PutMapping("/{voteId}")
+    @PostMapping("/{voteId}")
     public String addVotePaper(@Login Long userId, @PathVariable Long voteId, @RequestBody VoteResultType voteResultType){
         voteService.addVotePaper(userId, voteId, voteResultType);
         return "success";

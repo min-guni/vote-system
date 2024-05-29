@@ -21,15 +21,17 @@ import java.util.NoSuchElementException;
 @Slf4j
 public class ExceptionControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({UsernameAlreadyExistsException.class,
-            NoSuchElementException.class,
-            DuplicateRequestException.class,
+    @ExceptionHandler({NoSuchElementException.class,
             VoteResultTypeEnumParseException.class,
-            DuplicateUserExeption.class,
             OwnerDeleteException.class})
     public String BadRequestExHandle(Exception e) {
         return e.getMessage();
     }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler({UsernameAlreadyExistsException.class, AlreadyVotedException.class})
+    public String ConfictRequestExHandle(Exception e) {return e.getMessage();}
+
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler({LoginFailedException.class, UserNotFoundErrorException.class, TokenAuthenticationException.class})
