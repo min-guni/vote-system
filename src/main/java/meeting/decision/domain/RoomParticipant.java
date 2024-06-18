@@ -35,7 +35,7 @@ public class RoomParticipant {
     }
 
     @PrePersist
-    public void setEnterTime(){
+    private void setEnterTime(){
         enterTime = LocalDateTime.now();
     }
 }

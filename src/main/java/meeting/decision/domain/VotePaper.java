@@ -8,7 +8,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Getter @Setter
+@Getter
 @Table(name = "vote_papers")
 @NoArgsConstructor
 public class VotePaper {
@@ -39,7 +39,7 @@ public class VotePaper {
     }
 
     @PrePersist
-    public void setTimeStamp(){
+    private void setTimeStamp(){
         timeStamp = LocalDateTime.now();
     }
 }

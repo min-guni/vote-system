@@ -43,8 +43,7 @@ public class VoteService {
     @CheckUser(isOwner = true, isVote = true)
     public void update(Long ownerId, Long voteId, VoteUpdateDTO updateParam){
         Vote vote = voteRepository.findById(voteId).orElseThrow(VoteNotFoundException::new);
-        vote.setVoteName(updateParam.getVoteName());
-        vote.setActivated(updateParam.isActivated());
+        vote.updateVote(updateParam);
     }
     //delete
 

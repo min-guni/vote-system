@@ -5,13 +5,14 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import meeting.decision.dto.vote.VoteUpdateDTO;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter @Setter
+@Getter
 @NoArgsConstructor
 @Table(name = "votes")
 public class Vote {
@@ -42,8 +43,13 @@ public class Vote {
         this.isActivated = true;
     }
 
+    public void updateVote(VoteUpdateDTO voteUpdateDTO){
+        this.voteName = voteUpdateDTO.getVoteName();
+        this.isActivated = voteUpdateDTO.isActivated();
+    }
+
     @PrePersist
-    public void setTime(){
+    private void setTime(){
         this.startTime = LocalDateTime.now();
     }
 }
